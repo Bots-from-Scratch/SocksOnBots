@@ -8,7 +8,7 @@ Loading images via JavaScript module `import` is also supported, although not re
 
 ## Requirements
 
-[Node.js](https://nodejs.org) is required to install dependencies and run scripts via `npm`. Use the LTS version to avoid a bug in the biuld process.
+[Node.js](https://nodejs.org) is required to install dependencies and run scripts via `npm`. Use the LTS version to avoid a bug in the build process.
 
 ## Available Commands
 
