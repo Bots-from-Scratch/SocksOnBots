@@ -2,13 +2,13 @@
 
 A Phaser 3 project template with ES6 support via [Babel 7](https://babeljs.io/) and [Webpack 4](https://webpack.js.org/) that includes hot-reloading for development and production-ready builds.
 
-This has been updated for Phaser 3.50.0 version and above.
+This has been updated for Phaser 3.55.2 version and above. (23.10.22)
 
 Loading images via JavaScript module `import` is also supported, although not recommended.
 
 ## Requirements
 
-[Node.js](https://nodejs.org) is required to install dependencies and run scripts via `npm`.
+[Node.js](https://nodejs.org) is required to install dependencies and run scripts via `npm`. Use the LTS version to avoid a bug in the build process.
 
 ## Available Commands
 
