@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import css from "./style.css";
 import sky from './assets/sky.png';
 import platform from './assets/platform.png';
 import dude from './assets/dude.png';
