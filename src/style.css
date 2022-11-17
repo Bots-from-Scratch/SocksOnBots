@@ -1,6 +1,6 @@
 body {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
 }
@@ -10,11 +10,12 @@ canvas {
 }
 
 main {
+    display: flex;
+    flex-direction: column;
     width: 400px;
     position: relative;
     margin: 0 auto;
     overflow:hidden;
-    height: 600px;
 }
 
 header {
@@ -45,7 +46,7 @@ h1 {
 
 .blockly-editor {
     position: absolute;
-    top: 64px;
+    top: 120px;
     left: -400px;
     transition: left .4s;
     height: 460px;

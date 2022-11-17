@@ -16,6 +16,7 @@ var scoreText;
 var bombs;
 var value;
 var code;
+var playGame = false;
 
 (function() {
 
@@ -25,7 +26,7 @@ var code;
         // Add code for playing sound.
         loadWorkspace(event.target);
         code = Blockly.JavaScript.workspaceToCode(Blockly.common.getMainWorkspace());
-
+        playGame = !playGame;
 
 
     }
@@ -185,14 +186,14 @@ class MyGame extends Phaser.Scene {
     }
 
     update() {
-        if (cursors.up.isDown) {
-            eval(code);
-            // try {
-            //     console.log(code);
-            //     eval(code);
-            // } catch (error) {
-            //     console.log(error);
-            // }
+        if (playGame) {
+            // eval(code);
+            try {
+                eval(code);
+                playGame = !playGame;
+            } catch (error) {
+                console.log(error);
+            }
         }
         if (cursors.left.isDown || value === 'LEFT') {
             player.setVelocityX(-160);
@@ -208,8 +209,8 @@ class MyGame extends Phaser.Scene {
             player.anims.play('turn');
         }
 
-        if (cursors.up.isDown && value === 'UP') {
-            player.setVelocityY(-160);
+        if (cursors.up.isDown || value === 'UP') {
+            // player.setVelocityY(-160);
         } else if (cursors.down.isDown || value === 'DOWN') {
             player.setVelocityY(160);
         } else {

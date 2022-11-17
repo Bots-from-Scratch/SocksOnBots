@@ -21,23 +21,21 @@ Blockly.common.defineBlocksWithJsonArray([
 ]);
 
 
-Blockly.JavaScript['move_player'] = function(block, el) {
+Blockly.JavaScript['move_player'] = function (block, el) {
     let value = block.getFieldValue('VALUE');
-
+    let code;
 
     if (value == 'LEFT') {
-
-        let code = "console.log('left'); player.setVelocityX(-160); player.anims.play('left', true);";
-        return code;
+        code = "console.log('left'); console.log(player); player.x -= 1;";
     } else if (value == 'RIGHT') {
-        return right = true;
+        code = "setTimeout (function() {player.x += 1;}, 300)";
     } else if (value == 'UP') {
-        return up = true;
+        code = "player.y -= 1;";
     } else {
-        return down = true;
+        code = "player.y += 1;";
     }
+    return code;
 };
-
 
 
 // Blockly.JavaScript['move_player'] = function(block) {
