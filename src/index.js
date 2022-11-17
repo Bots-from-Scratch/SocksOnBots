@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import css from "./style.css";
+import './move_player';
 import sky from './assets/sky.png';
 import platform from './assets/platform.png';
 import dude from './assets/dude.png';
@@ -13,6 +14,98 @@ var cursors;
 var score = 0;
 var scoreText;
 var bombs;
+var value;
+var code;
+
+(function() {
+
+    let currentButton;
+
+    function handlePlay(event) {
+        // Add code for playing sound.
+        loadWorkspace(event.target);
+        code = Blockly.JavaScript.workspaceToCode(Blockly.common.getMainWorkspace());
+
+
+
+    }
+
+    function save(button) {
+        // Add code for saving the behavior of a button.
+        button.blocklySave = Blockly.serialization.workspaces.save(Blockly.common.getMainWorkspace());
+    }
+
+    function handleSave() {
+        document.body.setAttribute('mode', 'edit');
+        save(currentButton);
+    }
+
+    function enableEditMode() {
+        document.body.setAttribute('mode', 'edit');
+        document.querySelectorAll('.button').forEach(btn => {
+            btn.removeEventListener('click', handlePlay);
+            btn.addEventListener('click', enableBlocklyMode);
+        });
+    }
+
+    function enableMakerMode() {
+        document.body.setAttribute('mode', 'maker');
+        document.querySelectorAll('.button').forEach(btn => {
+            btn.addEventListener('click', handlePlay);
+            btn.removeEventListener('click', enableBlocklyMode);
+        });
+    }
+
+    function enableBlocklyMode(e) {
+        document.body.setAttribute('mode', 'blockly');
+        currentButton = e.target;
+        loadWorkspace(currentButton);
+    }
+
+    function loadWorkspace(button) {
+        const workspace = Blockly.common.getMainWorkspace();
+        if (button.blocklySave) {
+            Blockly.serialization.workspaces.load(button.blocklySave, workspace);
+        }
+    }
+
+    document.querySelector('#edit').addEventListener('click', enableEditMode);
+    document.querySelector('#done').addEventListener('click', enableMakerMode);
+    document.querySelector('#save').addEventListener('click', handleSave);
+
+    enableMakerMode();
+
+    const toolbox = {
+        'kind': 'flyoutToolbox',
+        'contents': [
+            {
+                'kind': 'block',
+                'type': 'controls_repeat_ext',
+                'inputs': {
+                    'TIMES': {
+                        'shadow': {
+                            'type': 'math_number',
+                            'fields': {
+                                'NUM': 5,
+                            },
+                        },
+                    },
+                },
+            },
+            {
+                'kind': 'block',
+                'type': 'move_player'
+            },
+        ],
+    };
+
+    Blockly.inject('blocklyDiv', {
+        toolbox: toolbox,
+        scrollbars: false,
+    });
+
+})();
+
 
 class MyGame extends Phaser.Scene {
     constructor() {
@@ -92,11 +185,20 @@ class MyGame extends Phaser.Scene {
     }
 
     update() {
-        if (cursors.left.isDown) {
+        if (cursors.up.isDown) {
+            eval(code);
+            // try {
+            //     console.log(code);
+            //     eval(code);
+            // } catch (error) {
+            //     console.log(error);
+            // }
+        }
+        if (cursors.left.isDown || value === 'LEFT') {
             player.setVelocityX(-160);
 
             player.anims.play('left', true);
-        } else if (cursors.right.isDown) {
+        } else if (cursors.right.isDown || value === 'RIGHT') {
             player.setVelocityX(160);
 
             player.anims.play('right', true);
@@ -106,9 +208,9 @@ class MyGame extends Phaser.Scene {
             player.anims.play('turn');
         }
 
-        if (cursors.up.isDown) {
+        if (cursors.up.isDown && value === 'UP') {
             player.setVelocityY(-160);
-        } else if (cursors.down.isDown) {
+        } else if (cursors.down.isDown || value === 'DOWN') {
             player.setVelocityY(160);
         } else {
             player.setVelocityY(0);
