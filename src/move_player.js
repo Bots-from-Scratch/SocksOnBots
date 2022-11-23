@@ -26,13 +26,13 @@ Blockly.JavaScript['move_player'] = function (block, el) {
     let code;
 
     if (value == 'LEFT') {
-        code = "console.log('left'); console.log(player); player.x -= 1;";
+        code = "player.setVelocityX(-160);";
     } else if (value == 'RIGHT') {
-        code = "setTimeout (function() {player.x += 1;}, 300)";
+        code = "player.setVelocityX(160);setTimeout (function() {player.setVelocityX(0);}, 600);";
     } else if (value == 'UP') {
-        code = "player.y -= 1;";
+        code = "player.setVelocityY(-160);setTimeout (function() {player.setVelocityY(0);}, 600);";
     } else {
-        code = "player.y += 1;";
+        code = "player.setVelocityY(160);setTimeout (function() {player.setVelocityY(0);}, 600);";
     }
     return code;
 };

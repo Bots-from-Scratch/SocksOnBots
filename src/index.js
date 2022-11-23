@@ -6,6 +6,7 @@ import platform from './assets/platform.png';
 import dude from './assets/dude.png';
 import star from './assets/star.png';
 import bomb from './assets/bomb.png';
+import {JavaScript} from "blockly";
 
 var player;
 var stars;
@@ -15,18 +16,33 @@ var score = 0;
 var scoreText;
 var bombs;
 var value;
-var code;
+var codeFromBlock;
 var playGame = false;
+var blockList = [];
+let gameTick = 0;
 
-(function() {
+
+(function () {
 
     let currentButton;
 
     function handlePlay(event) {
         // Add code for playing sound.
+        blockList = [];
+        Blockly.JavaScript.init(Blockly.common.getMainWorkspace());
         loadWorkspace(event.target);
-        code = Blockly.JavaScript.workspaceToCode(Blockly.common.getMainWorkspace());
+        codeFromBlock = Blockly.JavaScript.workspaceToCode(Blockly.common.getMainWorkspace());
         playGame = !playGame;
+        let blockListTmp = Blockly.common.getMainWorkspace().getAllBlocks(true);
+        // console.log("blockListTmp");
+        // console.log(blockListTmp);
+
+        blockListTmp.forEach(function (block) {
+            blockList.push(Blockly.JavaScript.blockToCode(block));
+
+        });
+        console.log("blockList");
+        console.log(blockList);
 
 
     }
@@ -92,6 +108,14 @@ var playGame = false;
                         },
                     },
                 },
+            },
+            {
+                'kind': 'block',
+                'type': 'controls_whileUntil',
+            },
+            {
+              'kind': 'block',
+              'type': 'logic_boolean',
             },
             {
                 'kind': 'block',
@@ -185,14 +209,31 @@ class MyGame extends Phaser.Scene {
         this.physics.add.overlap(player, stars, collectStar, null, this);
     }
 
-    update() {
-        if (playGame) {
-            // eval(code);
-            try {
-                eval(code);
-                playGame = !playGame;
-            } catch (error) {
-                console.log(error);
+    resources = 0;
+    timer = 0;
+
+    update(time, delta) {
+        this.timer += delta;
+        while (this.timer > 1000) {
+            this.resources += 1;
+            this.timer -= 1000;
+            gameTick++;
+            console.log(gameTick);
+            if (playGame) {
+                try {
+                    // eval(code);
+                    // eval(listBlock.next().value);
+                    let firstBlock = blockList.shift();
+
+                    console.log("firstBlock");
+                    console.log(firstBlock);
+                    console.log("blockList");
+                    console.log(blockList);
+                    playBlock.next(firstBlock);
+                    // playGame = !playGame;
+                } catch (error) {
+                    console.log(error);
+                }
             }
         }
         if (cursors.left.isDown || value === 'LEFT') {
@@ -204,7 +245,7 @@ class MyGame extends Phaser.Scene {
 
             player.anims.play('right', true);
         } else {
-            player.setVelocityX(0);
+            // player.setVelocityX(0);
 
             player.anims.play('turn');
         }
@@ -214,10 +255,34 @@ class MyGame extends Phaser.Scene {
         } else if (cursors.down.isDown || value === 'DOWN') {
             player.setVelocityY(160);
         } else {
-            player.setVelocityY(0);
+            // player.setVelocityY(0);
         }
     }
 }
+
+function* gen() {
+    while (true) {
+        const value = yield;
+        eval(value);
+    }
+}
+
+// const list = ["player.setVelocityX(160);setTimeout (function() {player.setVelocityX(0);}, 600); "];
+const playBlock = gen();
+
+function hitWorldBounds(player) {
+
+    //  Play the flash animation.
+    //
+    //  Sometimes you'll notice it doesn't always start, i.e. if the sprite
+    //  collides with the world bounds quickly before the previous 'flash'
+    //  has completed. This is just because the animation needs to complete
+    //  before playing again, the event did actually occur twice.
+
+    player.setVelocityX(160);
+
+}
+
 
 function collectStar(player, star) {
     star.disableBody(true, true);
@@ -239,6 +304,17 @@ function collectStar(player, star) {
     }
 
 }
+
+// var playBlocks = function* () {
+//     yield 1;
+//     yield 2;
+// };
+// var playBlocks = function* (blockList, listBlock = 1) {
+//     for (let index = 0; index < blockList.length; index += listBlock) {
+//         yield blockList.slice(index, index + listBlock);
+//     }
+// };
+
 
 function hitBomb(player) {
     this.physics.pause();
