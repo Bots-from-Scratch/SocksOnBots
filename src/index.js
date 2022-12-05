@@ -20,6 +20,8 @@ var codeFromBlock;
 var playGame = false;
 var blockList = [];
 let gameTick = 0;
+let blockListTmp;
+let code;
 
 
 (function () {
@@ -31,16 +33,18 @@ let gameTick = 0;
         blockList = [];
         Blockly.JavaScript.init(Blockly.common.getMainWorkspace());
         loadWorkspace(event.target);
-        codeFromBlock = Blockly.JavaScript.workspaceToCode(Blockly.common.getMainWorkspace());
-        playGame = !playGame;
-        let blockListTmp = Blockly.common.getMainWorkspace().getAllBlocks(true);
-        // console.log("blockListTmp");
-        // console.log(blockListTmp);
+        code = Blockly.JavaScript.workspaceToCode(Blockly.common.getMainWorkspace());
+        console.log("code");
+        console.log(code);
+        playGame = true;
+        blockListTmp = Blockly.common.getMainWorkspace().getAllBlocks(true);
+        console.log("blockListTmp");
+        console.log(blockListTmp);
 
-        blockListTmp.forEach(function (block) {
-            blockList.push(Blockly.JavaScript.blockToCode(block));
-
-        });
+        // blockListTmp.forEach(function (block) {
+        //     blockList.push(Blockly.JavaScript.blockToCode(block));
+        //
+        // });
         console.log("blockList");
         console.log(blockList);
 
@@ -221,54 +225,62 @@ class MyGame extends Phaser.Scene {
             console.log(gameTick);
             if (playGame) {
                 try {
-                    // eval(code);
+                    // value = '';
+                    eval(code);
                     // eval(listBlock.next().value);
-                    let firstBlock = blockList.shift();
-
-                    console.log("firstBlock");
-                    console.log(firstBlock);
-                    console.log("blockList");
-                    console.log(blockList);
-                    playBlock.next(firstBlock);
-                    // playGame = !playGame;
+                    // let firstBlock = blockListTmp.shift();
+                    //
+                    // console.log("firstBlock");
+                    // console.log(firstBlock);
+                    // console.log("blockList");
+                    // console.log(blockList.length);
+                    // playBlocks.next(firstBlock);
                 } catch (error) {
                     console.log(error);
                 }
             }
+            if (cursors.left.isDown || value === 'LEFT') {
+                player.setVelocityX(-160);
+
+                player.anims.play('left', true);
+            } else if (cursors.right.isDown || value === 'RIGHT') {
+                player.setVelocityX(160);
+
+                player.anims.play('right', true);
+            } else {
+                player.setVelocityX(0);
+
+                player.anims.play('turn');
+            }
+
+            if (cursors.up.isDown || value === 'UP') {
+                player.setVelocityY(-160);
+            } else if (cursors.down.isDown || value === 'DOWN') {
+                player.setVelocityY(160);
+            } else {
+                player.setVelocityY(0);
+            }
+            playGame = false;
+
         }
-        if (cursors.left.isDown || value === 'LEFT') {
-            player.setVelocityX(-160);
 
-            player.anims.play('left', true);
-        } else if (cursors.right.isDown || value === 'RIGHT') {
-            player.setVelocityX(160);
-
-            player.anims.play('right', true);
-        } else {
-            // player.setVelocityX(0);
-
-            player.anims.play('turn');
-        }
-
-        if (cursors.up.isDown || value === 'UP') {
-            // player.setVelocityY(-160);
-        } else if (cursors.down.isDown || value === 'DOWN') {
-            player.setVelocityY(160);
-        } else {
-            // player.setVelocityY(0);
-        }
     }
 }
 
 function* gen() {
     while (true) {
-        const value = yield;
-        eval(value);
+        const blockCode = yield;
+        // Blockly.JavaScript.init(Blockly.common.getMainWorkspace());
+        console.log("blockCode");
+        console.log(blockCode);
+        // console.log(Blockly.JavaScript.blockToCode(value));
+        value = blockCode;
     }
 }
 
 // const list = ["player.setVelocityX(160);setTimeout (function() {player.setVelocityX(0);}, 600); "];
-const playBlock = gen();
+const playBlocks = gen();
+
 
 function hitWorldBounds(player) {
 

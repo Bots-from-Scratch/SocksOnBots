@@ -25,17 +25,26 @@ Blockly.JavaScript['move_player'] = function (block, el) {
     let value = block.getFieldValue('VALUE');
     let code;
 
-    if (value == 'LEFT') {
-        code = "player.setVelocityX(-160);";
-    } else if (value == 'RIGHT') {
-        code = "player.setVelocityX(160);setTimeout (function() {player.setVelocityX(0);}, 600);";
-    } else if (value == 'UP') {
-        code = "player.setVelocityY(-160);setTimeout (function() {player.setVelocityY(0);}, 600);";
-    } else {
-        code = "player.setVelocityY(160);setTimeout (function() {player.setVelocityY(0);}, 600);";
-    }
+
+    code = 'playBlocks.next();\nsetTimeout(() => {playBlocks.next("' + value + '");}, 600);\n';
+
     return code;
 };
+// Blockly.JavaScript['move_player'] = function (block, el) {
+//     let value = block.getFieldValue('VALUE');
+//     let code;
+//
+//     if (value == 'LEFT') {
+//         code = 'playBlocks.next("' + value + '");\n';
+//     } else if (value == 'RIGHT') {
+//         code = 'playBlocks.next("' + value + '");\n';
+//     } else if (value == 'UP') {
+//         code = 'playBlocks.next("' + value + '");\n';
+//     } else {
+//         code = 'playBlocks.next("' + value + '");\n';
+//     }
+//     return code;
+// };
 
 
 // Blockly.JavaScript['move_player'] = function(block) {
