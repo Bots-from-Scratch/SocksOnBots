@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import css from "./style.css";
 import './move_player';
+import './check_for_collision';
 import sky from './assets/sky.png';
 import platform from './assets/platform.png';
 import dude from './assets/dude.png';
@@ -22,7 +23,7 @@ var blockList = [];
 let gameTick = 0;
 let blockListTmp;
 let code;
-
+let collided = false;
 
 (function () {
 
@@ -40,6 +41,7 @@ let code;
         blockListTmp = Blockly.common.getMainWorkspace().getAllBlocks(true);
         console.log("blockListTmp");
         console.log(blockListTmp);
+        // eval(code);
 
         // blockListTmp.forEach(function (block) {
         //     blockList.push(Blockly.JavaScript.blockToCode(block));
@@ -118,12 +120,20 @@ let code;
                 'type': 'controls_whileUntil',
             },
             {
-              'kind': 'block',
-              'type': 'logic_boolean',
+                'kind': 'block',
+                'type': 'controls_if',
+            },
+            {
+                'kind': 'block',
+                'type': 'logic_boolean',
             },
             {
                 'kind': 'block',
                 'type': 'move_player'
+            },
+            {
+                'kind': 'block',
+                'type': 'check_for_collision'
             },
         ],
     };
@@ -163,6 +173,7 @@ class MyGame extends Phaser.Scene {
         player = this.physics.add.sprite(100, 450, 'dude');
 
         player.setCollideWorldBounds(true);
+        player.body.onWorldBounds = true;
 
         this.anims.create({
             key: 'left',
@@ -207,74 +218,85 @@ class MyGame extends Phaser.Scene {
         this.physics.add.collider(bombs, platforms);
         this.physics.add.collider(player, bombs, hitBomb, null, this);
 
-        this.physics.add.collider(player, platforms);
+        this.physics.add.collider(player, platforms, function () {
+            collided = !collided;
+        });
         this.physics.add.collider(stars, platforms);
 
         this.physics.add.overlap(player, stars, collectStar, null, this);
+        this.physics.world.on('worldbounds', (body) => {
+            collided = !collided;
+        });
     }
 
     resources = 0;
     timer = 0;
 
     update(time, delta) {
-        this.timer += delta;
-        while (this.timer > 1000) {
-            this.resources += 1;
-            this.timer -= 1000;
-            gameTick++;
-            console.log(gameTick);
-            if (playGame) {
-                try {
-                    // value = '';
-                    eval(code);
-                    // eval(listBlock.next().value);
-                    // let firstBlock = blockListTmp.shift();
-                    //
-                    // console.log("firstBlock");
-                    // console.log(firstBlock);
-                    // console.log("blockList");
-                    // console.log(blockList.length);
-                    // playBlocks.next(firstBlock);
-                } catch (error) {
-                    console.log(error);
-                }
+        if (collided) {
+            console.log("collided");
+            // collided = false;
+        }
+        eval(code);
+
+        if (playGame) {
+            try {
+                // value = '';
+                // eval(listBlock.next().value);
+                // let firstBlock = blockListTmp.shift();
+                //
+                // console.log("firstBlock");
+                // console.log(firstBlock);
+                // console.log("blockList");
+                // console.log(blockList.length);
+                // playBlocks.next(firstBlock);
+            } catch (error) {
+                console.log(error);
             }
-            if (cursors.left.isDown || value === 'LEFT') {
-                player.setVelocityX(-160);
+        }
+        if (cursors.left.isDown || value === 'LEFT') {
+            player.setVelocityX(-160);
 
-                player.anims.play('left', true);
-            } else if (cursors.right.isDown || value === 'RIGHT') {
-                player.setVelocityX(160);
+            player.anims.play('left', true);
+        } else if (cursors.right.isDown || value === 'RIGHT') {
+            player.setVelocityX(160);
 
-                player.anims.play('right', true);
-            } else {
-                player.setVelocityX(0);
+            player.anims.play('right', true);
+        } else {
+            player.setVelocityX(0);
 
-                player.anims.play('turn');
-            }
-
-            if (cursors.up.isDown || value === 'UP') {
-                player.setVelocityY(-160);
-            } else if (cursors.down.isDown || value === 'DOWN') {
-                player.setVelocityY(160);
-            } else {
-                player.setVelocityY(0);
-            }
-            playGame = false;
-
+            player.anims.play('turn');
         }
 
+        if (cursors.up.isDown || value === 'UP') {
+            player.setVelocityY(-160);
+        } else if (cursors.down.isDown || value === 'DOWN') {
+            player.setVelocityY(160);
+        } else {
+            player.setVelocityY(0);
+        }
+        playGame = false;
+        if (value == 'STOP') {
+            player.setVelocityX(0);
+            player.setVelocityY(0);
+        }
     }
+
+
 }
 
 function* gen() {
     while (true) {
         const blockCode = yield;
+
         // Blockly.JavaScript.init(Blockly.common.getMainWorkspace());
         console.log("blockCode");
         console.log(blockCode);
         // console.log(Blockly.JavaScript.blockToCode(value));
         value = blockCode;
+        setTimeout(() => {
+            value = '';
+        }, 1200);
     }
 }
 
