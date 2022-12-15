@@ -12,6 +12,7 @@ Blockly.common.defineBlocksWithJsonArray([
                     ['up', 'UP'],
                     ['down', 'DOWN'],
                     ['stop', 'STOP'],
+                    ['to star', 'TOSTAR']
                 ],
             },
         ],
@@ -47,7 +48,13 @@ Blockly.JavaScript['move_player'] = function (block, el) {
     let blockValue = block.getFieldValue('VALUE');
     let code;
 
-    code = 'if("' + blockValue + '" != value) { value = "' + blockValue + '"; }\nif(value == \'STOP\') {console.log("Stop")};';
+    if (blockValue == 'TOSTAR') {
+
+        code = ' this.physics.accelerateToObject(player,blueStar, 4000 ); '
+    }
+    else {
+        code = 'if("' + blockValue + '" != value) { value = "' + blockValue + '"; }\nif(value == \'STOP\') {console.log("Stop")};';
+    }
 
     return code;
 };
