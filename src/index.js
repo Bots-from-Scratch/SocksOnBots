@@ -163,17 +163,21 @@ class MyGame extends Phaser.Scene {
     create() {
         this.add.image(400, 300, 'sky');
 
+
         platforms = this.physics.add.staticGroup();
 
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        platforms.create(300, 100, 'ground').setScale(0.3,1.2).refreshBody();
+        platforms.create(300, 100, 'ground').setScale(0.3, 1.2).refreshBody().setSize(150, 42, true);
 
 
         platforms.create(600, 400, 'ground');
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
 
-        blueStar = this.physics.add.sprite(500,100,'star');
+        // platforms.setSize(400, 50, true);
+
+        platforms.setTint(0x000bbb);
+        blueStar = this.physics.add.sprite(500, 100, 'star');
         blueStar.setTint(0x006db2);
 
         player = this.physics.add.sprite(100, 100, 'dude');
@@ -218,7 +222,7 @@ class MyGame extends Phaser.Scene {
         //     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         // });
 
-        scoreText = this.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#000'});
+        scoreText = this.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#fff'});
 
         bombs = this.physics.add.group();
 
@@ -226,14 +230,35 @@ class MyGame extends Phaser.Scene {
         this.physics.add.collider(player, bombs, hitBomb, null, this);
 
         this.physics.add.collider(player, platforms, function () {
-            collided = !collided;
+            collided = true;
+            if (!player.body.blocked.none) {
+
+                if (player.body.blocked.up) {
+                    player.setY(player.y + 1);
+                }
+                else if (player.body.blocked.down) {
+                    player.setY(player.y - 1);
+                }
+                else if (player.body.blocked.right) {
+                    player.setX(player.x - 1);
+                } else {
+                    player.setX(player.x + 1);
+                }
+                player.setVelocityX(0);
+                player.setVelocityY(0);
+            }
         });
         // this.physics.add.collider(stars, platforms);
 
         this.physics.add.overlap(player, blueStar, collectStar, null, this);
+        this.physics.add.overlap(player, platforms, function () {
+            collided = true;
+            console.log("collision with platform");
+            // player.setCircle(20);
+        });
 
         this.physics.world.on('worldbounds', (body) => {
-            collided = !collided;
+            collided = true;
         });
 
     }
@@ -242,6 +267,8 @@ class MyGame extends Phaser.Scene {
     timer = 0;
 
     update(time, delta) {
+// player.setCircle(50);
+
 
         if (collided) {
             console.log("collided");
@@ -250,12 +277,12 @@ class MyGame extends Phaser.Scene {
         }
         if (player.body.touching.none) {
             value = '';
+            collided = false;
 
             player.setVelocityX(0);
             player.setVelocityY(0);
         }
         eval(code);
-        collided = false;
 
         if (playGame) {
             try {
@@ -340,7 +367,9 @@ function collectStar(player, star) {
     star.disableBody(true, true);
 
     score += 10;
-    scoreText.setText('Score: ' + score);
+    this.physics.pause();
+    scoreText.setText('Level Completed');
+    this.gameOver = true;
 
     // if (stars.countActive(true) === 0) {
     //     stars.children.iterate(function (child) {
@@ -349,10 +378,10 @@ function collectStar(player, star) {
     //
     //     var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
-        // var bomb = bombs.create(x, 16, 'bomb');
-        // bomb.setBounce(1);
-        // bomb.setCollideWorldBounds(true);
-        // bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    // var bomb = bombs.create(x, 16, 'bomb');
+    // bomb.setBounce(1);
+    // bomb.setCollideWorldBounds(true);
+    // bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
     // }
 
 }
@@ -387,7 +416,7 @@ const config = {
         default: 'arcade',
         arcade: {
             // gravity: { y: 300 },
-            debug: false
+            debug: true
         }
     },
     scene: MyGame
