@@ -16,11 +16,13 @@ var platforms;
 var cursors;
 var score = 0;
 var scoreText;
+var statusText;
 var bombs;
 var value;
 var codeFromBlock;
 var playGame = false;
 var blockList = [];
+var gfx;
 let gameTick = 0;
 let blockListTmp;
 let code;
@@ -50,7 +52,6 @@ let collided = false;
         // });
         console.log("blockList");
         console.log(blockList);
-
 
     }
 
@@ -181,6 +182,8 @@ class MyGame extends Phaser.Scene {
         blueStar.setTint(0x006db2);
 
         player = this.physics.add.sprite(100, 100, 'dude');
+        player.body.bounce.set(1);
+        player.body.setMaxSpeed(5000);
 
         player.setCollideWorldBounds(true);
         player.body.onWorldBounds = true;
@@ -223,7 +226,11 @@ class MyGame extends Phaser.Scene {
         // });
 
         scoreText = this.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#fff'});
-
+        statusText = this.add.text(16, 50, 'Speed: ' + player.velocity + 'Angle: ' + player.angle, {
+            fontSize: '32px',
+            fill: '#fff'
+        });
+        gfx = this.add.graphics();
         bombs = this.physics.add.group();
 
         this.physics.add.collider(bombs, platforms);
@@ -231,22 +238,20 @@ class MyGame extends Phaser.Scene {
 
         this.physics.add.collider(player, platforms, function () {
             collided = true;
-            if (!player.body.blocked.none) {
-
-                if (player.body.blocked.up) {
-                    player.setY(player.y + 1);
-                }
-                else if (player.body.blocked.down) {
-                    player.setY(player.y - 1);
-                }
-                else if (player.body.blocked.right) {
-                    player.setX(player.x - 1);
-                } else {
-                    player.setX(player.x + 1);
-                }
-                player.setVelocityX(0);
-                player.setVelocityY(0);
-            }
+            // if (!player.body.blocked.none) {
+            //
+            //     if (player.body.blocked.up) {
+            //         player.setY(player.y + 2);
+            //     } else if (player.body.blocked.down) {
+            //         player.setY(player.y - 2);
+            //     } else if (player.body.blocked.right) {
+            //         player.setX(player.x - 2);
+            //     } else {
+            //         player.setX(player.x + 2);
+            //     }
+            //     player.setVelocityX(0);
+            //     player.setVelocityY(0);
+            // }
         });
         // this.physics.add.collider(stars, platforms);
 
@@ -267,12 +272,26 @@ class MyGame extends Phaser.Scene {
     timer = 0;
 
     update(time, delta) {
+
+        var closest = this.physics.closest(player, platforms.getChildren());
+        console.log(closest);
+        gfx.clear()
+            .lineStyle(2, 0xff3300)
+            .lineBetween(closest.x, closest.y, player.x, player.y)
+        var dist = Phaser.Math.Distance.BetweenPoints(player, blueStar);
+        if (dist < 100) {
+            console.log("platform detected");
+            this.physics.accelerateToObject(player, blueStar, 4000);
+        }
+        // this.physics.velocityFromRotation(player.rotation, player.body.maxSpeed, player.body.acceleration);
+
+        statusText.setText('  Closest: ' + this.physics.closest(player, platforms.getChildren()).displayWidth + ' dist: ' + dist);
 // player.setCircle(50);
-
-
+//         console.log(player.angle + ":" + Phaser.Math.RadToDeg(player.rotation));
+        // player.angle += 0.5
         if (collided) {
             console.log("collided");
-            console.log(player.body.touching);
+            console.log(player.body.blocked);
 
         }
         if (player.body.touching.none) {
@@ -282,10 +301,11 @@ class MyGame extends Phaser.Scene {
             player.setVelocityX(0);
             player.setVelocityY(0);
         }
-        eval(code);
-
         if (playGame) {
+
             try {
+                eval(code);
+
                 // value = '';
                 // eval(listBlock.next().value);
                 // let firstBlock = blockListTmp.shift();
@@ -299,12 +319,16 @@ class MyGame extends Phaser.Scene {
                 console.log(error);
             }
         }
+        if (cursors.space.isDown) {
+            this.physics.velocityFromRotation(player.rotation, player.body.maxSpeed, player.body.acceleration);
+        }
         if (cursors.left.isDown || value === 'LEFT') {
-            player.setVelocityX(-160);
+            player.angle = 180;
 
             player.anims.play('left', true);
         } else if (cursors.right.isDown || value === 'RIGHT') {
-            player.setVelocityX(160);
+            player.angle = 0;
+
 
             player.anims.play('right', true);
         } else {
@@ -314,9 +338,11 @@ class MyGame extends Phaser.Scene {
         }
 
         if (cursors.up.isDown || value === 'UP') {
-            player.setVelocityY(-160);
+            player.angle = -90;
+
         } else if (cursors.down.isDown || value === 'DOWN') {
-            player.setVelocityY(160);
+            player.angle = 90;
+
         } else {
             player.setVelocityY(0);
         }
@@ -329,6 +355,7 @@ class MyGame extends Phaser.Scene {
 
 
 }
+
 
 function* gen() {
     while (true) {
