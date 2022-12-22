@@ -7,7 +7,8 @@ import platform from './assets/platform.png';
 import dude from './assets/dude.png';
 import star from './assets/star.png';
 import bomb from './assets/bomb.png';
-import {JavaScript} from "blockly";
+import { JavaScript } from "blockly";
+import * as worldLoader from './maps/world_loader';
 
 var player;
 var stars;
@@ -154,16 +155,12 @@ class MyGame extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('sky', sky);
-        this.load.image('ground', platform);
-        this.load.image('star', star);
-        this.load.image('bomb', bomb);
-        this.load.spritesheet('dude', dude, {frameWidth: 32, frameHeight: 48});
+        worldLoader.preload(this);
     }
 
     create() {
-        this.add.image(400, 300, 'sky');
 
+        worldLoader.createBackground(this);
 
         platforms = this.physics.add.staticGroup();
 
@@ -190,20 +187,20 @@ class MyGame extends Phaser.Scene {
 
         this.anims.create({
             key: 'left',
-            frames: this.anims.generateFrameNumbers('dude', {start: 0, end: 3}),
+            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
             frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
             key: 'turn',
-            frames: [{key: 'dude', frame: 4}],
+            frames: [{ key: 'dude', frame: 4 }],
             frameRate: 20
         });
 
         this.anims.create({
             key: 'right',
-            frames: this.anims.generateFrameNumbers('dude', {start: 5, end: 8}),
+            frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
             frameRate: 10,
             repeat: -1
         });
@@ -225,7 +222,7 @@ class MyGame extends Phaser.Scene {
         //     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         // });
 
-        scoreText = this.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#fff'});
+        scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
         statusText = this.add.text(16, 50, 'Speed: ' + player.velocity + 'Angle: ' + player.angle, {
             fontSize: '32px',
             fill: '#fff'
@@ -286,8 +283,8 @@ class MyGame extends Phaser.Scene {
         // this.physics.velocityFromRotation(player.rotation, player.body.maxSpeed, player.body.acceleration);
 
         statusText.setText('  Closest: ' + this.physics.closest(player, platforms.getChildren()).displayWidth + ' dist: ' + dist);
-// player.setCircle(50);
-//         console.log(player.angle + ":" + Phaser.Math.RadToDeg(player.rotation));
+        // player.setCircle(50);
+        //         console.log(player.angle + ":" + Phaser.Math.RadToDeg(player.rotation));
         // player.angle += 0.5
         if (collided) {
             console.log("collided");
