@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import css from "./style.css";
 import './move_player';
 import './check_for_collision';
+import './direction_blocked';
+import './direction_clear';
 import sky from './assets/sky.png';
 import platform from './assets/platform.png';
 import dude from './assets/dude.png';
@@ -27,6 +29,66 @@ let gameTick = 0;
 let blockListTmp;
 let code;
 let collided = false;
+var graphic;
+var rightIsClear = true;
+var leftIsClear = true;
+var upIsClear = true;
+var downIsClear = true;
+var objectCollidedWith
+var json = {
+    "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+            {
+                "type": "controls_if",
+                "id": "e3H5^8+HCBJ01_e1Y1Zg",
+                "x": 24,
+                "y": 113,
+                "extraState": {
+                    "elseIfCount": 1
+                },
+                "inputs": {
+                    "IF0": {
+                        "block": {
+                            "type": "direction_clear",
+                            "id": "P4RJHTCTGtoLT}5556^c",
+                            "fields": {
+                                "NAME": "RIGHT_CLEAR"
+                            }
+                        }
+                    },
+                    "DO0": {
+                        "block": {
+                            "type": "move_player",
+                            "id": "iHHZ{bU1f9Tc-;I8JGRB",
+                            "fields": {
+                                "VALUE": "RIGHT"
+                            }
+                        }
+                    },
+                    "IF1": {
+                        "block": {
+                            "type": "direction_blocked",
+                            "id": "]]f;q$$:gA:vFWTr(pIH",
+                            "fields": {
+                                "NAME": "RIGHT_BLOCKED"
+                            }
+                        }
+                    },
+                    "DO1": {
+                        "block": {
+                            "type": "move_player",
+                            "id": "GNq:N,Y2H))*GE1P9ex1",
+                            "fields": {
+                                "VALUE": "DOWN"
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+    }
+};
 
 (function () {
 
@@ -44,7 +106,7 @@ let collided = false;
         blockListTmp = Blockly.common.getMainWorkspace().getAllBlocks(true);
         console.log("blockListTmp");
         console.log(blockListTmp);
-        // eval(code);
+        eval(code);
 
         // blockListTmp.forEach(function (block) {
         //     blockList.push(Blockly.JavaScript.blockToCode(block));
@@ -119,10 +181,6 @@ let collided = false;
             },
             {
                 'kind': 'block',
-                'type': 'controls_whileUntil',
-            },
-            {
-                'kind': 'block',
                 'type': 'controls_if',
             },
             {
@@ -136,6 +194,14 @@ let collided = false;
             {
                 'kind': 'block',
                 'type': 'check_for_collision'
+            },
+            {
+                'kind': 'block',
+                'type': 'direction_blocked'
+            },
+            {
+                'kind': 'block',
+                'type': 'direction_clear'
             },
         ],
     };
@@ -168,7 +234,7 @@ class MyGame extends Phaser.Scene {
         platforms = this.physics.add.staticGroup();
 
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        platforms.create(300, 100, 'ground').setScale(0.3, 1.2).refreshBody().setSize(150, 42, true);
+        platforms.create(300, 100, 'ground').setScale(0.3, 5).refreshBody();
 
 
         platforms.create(600, 400, 'ground');
@@ -227,7 +293,7 @@ class MyGame extends Phaser.Scene {
 
         scoreText = this.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#fff'});
         statusText = this.add.text(16, 50, 'Speed: ' + player.velocity + 'Angle: ' + player.angle, {
-            fontSize: '32px',
+            fontSize: '16px',
             fill: '#fff'
         });
         gfx = this.add.graphics();
@@ -236,22 +302,27 @@ class MyGame extends Phaser.Scene {
         this.physics.add.collider(bombs, platforms);
         this.physics.add.collider(player, bombs, hitBomb, null, this);
 
-        this.physics.add.collider(player, platforms, function () {
+        this.physics.add.collider(player, platforms, function (player, platform) {
+            objectCollidedWith = platform;
             collided = true;
-            // if (!player.body.blocked.none) {
-            //
-            //     if (player.body.blocked.up) {
-            //         player.setY(player.y + 2);
-            //     } else if (player.body.blocked.down) {
-            //         player.setY(player.y - 2);
-            //     } else if (player.body.blocked.right) {
-            //         player.setX(player.x - 2);
-            //     } else {
-            //         player.setX(player.x + 2);
-            //     }
-            //     player.setVelocityX(0);
-            //     player.setVelocityY(0);
-            // }
+            if (!player.body.blocked.none) {
+
+                if (player.body.blocked.up) {
+                    // player.setY(player.y + 2);
+                    upIsClear = false;
+                } else if (player.body.blocked.down) {
+                    // player.setY(player.y - 2);
+                    downIsClear = false;
+                } else if (player.body.blocked.right) {
+                    // player.setX(player.x - 2);
+                    rightIsClear = false;
+                } else {
+                    // player.setX(player.x + 2);
+                    leftIsClear = false;
+                }
+                player.setVelocityX(0);
+                player.setVelocityY(0);
+            }
         });
         // this.physics.add.collider(stars, platforms);
 
@@ -265,46 +336,79 @@ class MyGame extends Phaser.Scene {
         this.physics.world.on('worldbounds', (body) => {
             collided = true;
         });
-
+        graphic = this.add.graphics({lineStyle: {color: 0x00ffff}});
     }
 
     resources = 0;
     timer = 0;
 
     update(time, delta) {
+// console.log(player.body.onWall());
+        if (objectCollidedWith) {
+            var closest = this.physics.closest(player, platforms.getChildren());
+            // console.log(closest);
+            var distCheb = Phaser.Math.RoundTo(Phaser.Math.Distance.Chebyshev(player.x, player.y, objectCollidedWith.x, objectCollidedWith.y), 0);
+            var distClosest = Phaser.Math.RoundTo(Phaser.Math.Distance.BetweenPoints(player, objectCollidedWith), 0);
+            var hypot = Math.hypot(player.body.halfHeight + objectCollidedWith.body.halfHeight, player.body.halfWidth + objectCollidedWith.body.halfWidth);
 
-        var closest = this.physics.closest(player, platforms.getChildren());
-        console.log(closest);
-        gfx.clear()
-            .lineStyle(2, 0xff3300)
-            .lineBetween(closest.x, closest.y, player.x, player.y)
-        var dist = Phaser.Math.Distance.BetweenPoints(player, blueStar);
-        if (dist < 100) {
-            console.log("platform detected");
-            this.physics.accelerateToObject(player, blueStar, 4000);
-        }
-        // this.physics.velocityFromRotation(player.rotation, player.body.maxSpeed, player.body.acceleration);
 
-        statusText.setText('  Closest: ' + this.physics.closest(player, platforms.getChildren()).displayWidth + ' dist: ' + dist);
+            // console.log(distClosest);
+            // if (distClosest < Phaser.Math.Distance.Between(closest.x, closest.y, (closest.body.position.x + 1), (closest.body.position.y + 1))) {
+            if (distClosest > hypot) {
+                console.log("clear")
+                leftIsClear = true;
+                rightIsClear = true;
+                downIsClear = true;
+                upIsClear = true;
+                // this.physics.accelerateToObject(player, blueStar, 4000);
+            }
+
+            graphic
+                .clear()
+                .strokeCircle(player.x, player.y, distClosest).strokeRect(player.x - distCheb, player.y - distCheb, 2 * distCheb, 2 * distCheb);
+            ;
+
+
+            // if (closest.body && collided) {
+            //     console.log(distCheb);
+            //     if ((distCheb + closest.body.halfHeight) < distClosest) {
+            //         console.log("distChev < halfHeight")
+            //         this.physics.pause();
+            //         player.angle = 0;
+            //     }
+            // }
+            gfx.clear()
+                .lineStyle(2, 0xff3300)
+                .lineBetween(objectCollidedWith.x, objectCollidedWith.y, player.x, player.y)
+            var dist = Phaser.Math.Distance.BetweenPoints(player, blueStar);
+            if (dist < 100) {
+                console.log("platform detected");
+                this.physics.accelerateToObject(player, blueStar, 4000);
+            }
+            // this.physics.velocityFromRotation(player.rotation, player.body.maxSpeed, player.body.acceleration);
+
+            statusText.setText('  right clear: ' + rightIsClear + '\n distClosest: ' + distClosest + ' hypot: ' + hypot);
 // player.setCircle(50);
 //         console.log(player.angle + ":" + Phaser.Math.RadToDeg(player.rotation));
-        // player.angle += 0.5
-        if (collided) {
-            console.log("collided");
-            console.log(player.body.blocked);
-
+            // player.angle += 0.5
+            // if (collided) {
+            //     console.log("collided");
+            //     console.log(player.body.blocked);
+            //
+            // }
         }
-        if (player.body.touching.none) {
-            value = '';
-            collided = false;
-
-            player.setVelocityX(0);
-            player.setVelocityY(0);
-        }
+        // if (player.body.touching.none) {
+        //     value = '';
+        //     collided = false;
+        //
+        //     player.setVelocityX(0);
+        //     player.setVelocityY(0);
+        // }
+        // eval(code);
         if (playGame) {
 
             try {
-                eval(code);
+
 
                 // value = '';
                 // eval(listBlock.next().value);
@@ -321,28 +425,31 @@ class MyGame extends Phaser.Scene {
         }
         if (cursors.space.isDown) {
             this.physics.velocityFromRotation(player.rotation, player.body.maxSpeed, player.body.acceleration);
+            player.setVelocityX(0);
+
         }
         if (cursors.left.isDown || value === 'LEFT') {
-            player.angle = 180;
+            // player.angle = 180;
+            player.setVelocityX(-160);
 
             player.anims.play('left', true);
         } else if (cursors.right.isDown || value === 'RIGHT') {
             player.angle = 0;
-
+            player.setVelocityX(160);
 
             player.anims.play('right', true);
         } else {
-            player.setVelocityX(0);
+            // player.setVelocityX(0);
 
             player.anims.play('turn');
         }
 
         if (cursors.up.isDown || value === 'UP') {
             player.angle = -90;
-
+            player.setVelocityY(-160);
         } else if (cursors.down.isDown || value === 'DOWN') {
             player.angle = 90;
-
+            player.setVelocityY(160);
         } else {
             player.setVelocityY(0);
         }
