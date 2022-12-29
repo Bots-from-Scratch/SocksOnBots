@@ -36,13 +36,13 @@ Blockly.JavaScript['direction_clear'] = function(block) {
   var code = '';
   // TODO: Assemble JavaScript into code variable.
   if (dropdown_name == 'RIGHT_CLEAR') {
-    code += 'rightIsClear'
+    code += 'this.rightIsClear'
   } else if (dropdown_name == 'LEFT_CLEAR') {
-    code += 'leftIsClear'
+    code += 'this.leftIsClear'
   } else if (dropdown_name == 'UP_CLEAR') {
-    code += 'upIsClear'
+    code += 'this.upIsClear'
   } else {
-    code += 'downIsClear'
+    code += 'this.downIsClear'
   }
 
   // TODO: Change ORDER_NONE to the correct strength.

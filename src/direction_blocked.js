@@ -36,13 +36,13 @@ Blockly.JavaScript['direction_blocked'] = function(block) {
     var code = '';
     // TODO: Assemble JavaScript into code variable.
     if (dropdown_name == 'RIGHT_BLOCKED') {
-        code += '!rightIsClear'
+        code += '!this.rightIsClear'
     } else if (dropdown_name == 'LEFT_BLOCKED') {
-        code += '!leftIsClear'
+        code += '!this.leftIsClear'
     } else if (dropdown_name == 'UP_BLOCKED') {
-        code += '!upIsClear'
+        code += '!this.upIsClear'
     } else {
-        code += '!downIsClear'
+        code += '!this.downIsClear'
     }
 
     // TODO: Change ORDER_NONE to the correct strength.
