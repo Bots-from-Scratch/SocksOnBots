@@ -1,16 +1,16 @@
 Blockly.common.defineBlocksWithJsonArray([
     {
-        "type": "check_for_collision",
-        "message0": "Collision",
+        "type": "walked_around",
+        "message0": "Walked Around",
         "output": "Boolean",
         "colour": 230,
-        "tooltip": "If player collides, this returns true",
+        "tooltip": "If player walked around obstacle, this returns true",
         "helpUrl": ""
     }
 ]);
 
 
-Blockly.JavaScript['check_for_collision'] = function(block) {
+Blockly.JavaScript['walked_around'] = function(block) {
     // TODO: Assemble JavaScript into code variable.
     var code = 'collided';
     // TODO: Change ORDER_NONE to the correct strength.
