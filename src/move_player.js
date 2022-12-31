@@ -53,7 +53,7 @@ Blockly.JavaScript['move_player'] = function (block, el) {
         code = ' this.physics.accelerateToObject(player,blueStar, 4000 ); '
     }
     else {
-        code = 'if("' + blockValue + '" != value) { value = "' + blockValue + '"; }\nif(value == \'STOP\') {console.log("Stop")};';
+        code = 'if("' + blockValue + '" != this.value) { this.value = "' + blockValue + '"; }\nif(this.value == \'STOP\') {console.log("Stop")};';
     }
 
     return code;

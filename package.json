@@ -37,6 +37,12 @@
   },
   "dependencies": {
     "blockly": "^9.0.1",
+    "browserify-fs": "^1.0.0",
     "phaser": "^3.55.2"
+  },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
   }
 }
