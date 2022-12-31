@@ -172,9 +172,10 @@ class MyGame extends Phaser.Scene {
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
 
-        // platforms.setSize(400, 50, true);
+        // // platforms.setSize(400, 50, true);
 
-        platforms.setTint(0x000bbb);
+        // platforms.setTint(0x000bbb);
+
         blueStar = this.physics.add.sprite(500, 100, 'star');
         blueStar.setTint(0x006db2);
 
