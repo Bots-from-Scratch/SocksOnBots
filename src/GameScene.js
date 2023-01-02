@@ -60,11 +60,9 @@ class GameScene extends Scene {
 
         this.button = this.add.text(95, 400, 'Back to Menu');
         this.buttonUp = this.add.text(600, 400, 'Increase Score');
-        this.button.setInteractive();
+        this.button.setInteractive().on('pointerover', () => this.button.setTint(0x006db2)).on('pointerdown', () => this.scene.start('menu'));
+        
         this.buttonUp.setInteractive();
-        this.button.on('pointerover', () => this.button.setTint(0x006db2));
-        this.button.on('pointerdown', () => this.scene.start('preload'));
-
         this.buttonUp.on('pointerdown', () => {
             this.score += 10;
             this.scoreText.setText('Score: ' + this.score);
