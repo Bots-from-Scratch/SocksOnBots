@@ -45,6 +45,7 @@ class GameScene extends Scene {
         this.blockingObjects = undefined;
         this.objectToScanFor = undefined;
         this.objectSighted = false;
+        this.scanAngle = 0;
     }
 
     preload() {
@@ -96,6 +97,7 @@ class GameScene extends Scene {
             }
         });
         this.scanLine = new Phaser.Geom.Line(this.player.x, this.player.y, this.blueStar.x, this.blueStar.y);
+        this.scanLineRot = new Phaser.Geom.Line(this.player.x, this.player.y, 300, 100);
         this.scanLineGfx = this.add.graphics({
             fillStyle: {
                 color: 0x00ffff,
@@ -270,14 +272,20 @@ class GameScene extends Scene {
     }
 
     update() {
+
         if (!this.scannedObject) {
             this.scanLineGfx.setVisible(false);
         }
         this.scanCircle.setPosition(this.player.x, this.player.y)
-        this.scanLine.setTo(this.player.x, this.player.y, this.blueStar.x, this.blueStar.y)
+        this.scanLine.setTo(this.player.x, this.player.y, this.blueStar.x, this.blueStar.y);
+        this.scanAngle -= 0.04;
+        Phaser.Geom.Line.SetToAngle(this.scanLineRot, this.player.x, this.player.y, this.scanAngle, 200);
+        if (Phaser.Geom.Intersects.LineToRectangle(this.scanLineRot, this.blueStar) && this.scannedObject) {
+            this.objectSighted = true;
+        };
         this.scanGfx
             .clear()
-            .strokeCircleShape(this.scanCircle).strokeRectShape(this.testBlockRect);
+            .strokeCircleShape(this.scanCircle).strokeRectShape(this.testBlockRect).strokeLineShape(this.scanLineRot);
         ;
         this.scanLineGfx.clear().strokeLineShape(this.scanLine);
         if (this.objectToScanFor) {
