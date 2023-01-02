@@ -11,6 +11,9 @@ class GameScene extends Scene {
     ROTATION_LEFT = 180;
     ROTATION_UP = -90;
     ROTATION_DOWN = 90;
+    SCAN_DISTANCE = 200;
+
+
     constructor() {
         super('game');
 
@@ -37,7 +40,11 @@ class GameScene extends Scene {
         this.upIsClear = true;
         this.downIsClear = true;
 
+        this.scannedObject = false;
         this.objectCollidedWith = {};
+        this.blockingObjects = undefined;
+        this.objectToScanFor = undefined;
+        this.objectSighted = false;
     }
 
     preload() {
@@ -55,37 +62,12 @@ class GameScene extends Scene {
         this.createPlayer();
         this.createCursor();
         this.createStar();
+        this.createButtons();
 
         this.scoreText = this.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#fff'});
 
-        this.button = this.add.text(95, 400, 'Back to Menu');
-        this.buttonUp = this.add.text(600, 400, 'Increase Score');
-        this.button.setInteractive();
-        this.buttonUp.setInteractive();
-        this.button.on('pointerover', () => this.button.setTint(0x006db2));
-        this.button.on('pointerdown', () => this.scene.start('preload'));
-
-        this.buttonUp.on('pointerdown', () => {
-            this.score += 10;
-            this.scoreText.setText('Score: ' + this.score);
-            console.log(this.player);
-        });
 
 
-        // stars = this.physics.add.group({
-        //     key: 'star',
-        //     frameQuantity: 1,
-        //     // setXY: { x: Phaser.Math.Between(10, 450), y: Phaser.Math.Between(10, 790), stepX: Phaser.Math.Between(10, 90) }
-        //     setXY: {x:500, y:100}
-        // });
-        // var rect = new Phaser.Geom.Rectangle(0, 0, 800, 600);
-        //
-        // Phaser.Actions.RandomRectangle(stars.getChildren(), rect);
-        //
-        // stars.children.iterate(function (child) {
-        //
-        //     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-        // });
 
 
         this.statusText = this.add.text(16, 50, 'Speed: ' + this.player.velocity + 'Angle: ' + this.player.body.rotation, {
@@ -106,8 +88,30 @@ class GameScene extends Scene {
             this.collided = true;
         });
         this.graphic = this.add.graphics({lineStyle: {color: 0x00ffff}});
+        this.graphic.setVisible(false);
+        this.scanGfx = this.add.graphics({
+            fillStyle: {
+                color: 0x00ffff,
+                alpha: 0.5
+            }
+        });
+        this.scanLine = new Phaser.Geom.Line(this.player.x, this.player.y, this.blueStar.x, this.blueStar.y);
+        this.scanLineGfx = this.add.graphics({
+            fillStyle: {
+                color: 0x00ffff,
+                alpha: 0.5
+            }
+        });
+        this.scanLineGfx.setVisible(false);
 
+        this.testBlockRect = new Phaser.Geom.Rectangle(200, 50, 100, 200);
+        this.scanCircle = new Phaser.Geom.Circle(300, 400, this.SCAN_DISTANCE);
+        this.blockingObjects = this.platforms;
     }
+
+
+//------------------------------------------------------------------------------------------------------------
+//-------CREATE FUNCTIONS
 
     createPlatforms() {
         this.platforms = this.physics.add.staticGroup();
@@ -129,14 +133,11 @@ class GameScene extends Scene {
         this.player = this.physics.add.sprite(100, 100, 'dude');
         // this.player.body.bounce.set(1);
         this.player.body.setMaxSpeed(160);
+        this.player.setCircle(20, -4, 10);
         this.physics.add.collider(this.player, this.platforms, function (_player, _platform) {
-            console.log(_platform);
             this.objectCollidedWith = _platform;
-            console.log(this.objectCollidedWith);
             this.collided = true;
-            console.log(this.collided);
             this.walkedBy = false;
-            console.log(this.walkedBy);
             if (!_player.body.blocked.none) {
 
                 if (_player.body.blocked.up) {
@@ -155,7 +156,7 @@ class GameScene extends Scene {
                 this.player.setVelocityX(0);
                 this.player.setVelocityY(0);
             }
-        },this.processCallback, this);
+        }, this.processCallback, this);
 
         this.player.setCollideWorldBounds(true);
         this.player.body.onWorldBounds = true;
@@ -192,19 +193,54 @@ class GameScene extends Scene {
         this.physics.add.overlap(this.player, this.blueStar, this.collectStar, null, this);
     }
 
-    processCallback (obj1, obj2) {
+    createButtons() {
+        this.button = this.add.text(95, 400, 'Back to Menu');
+        this.buttonUp = this.add.text(600, 400, 'Increase Score');
+        this.buttonScan = this.add.text(600, 450, 'Scan For Star');
+        this.button.setInteractive();
+        this.buttonUp.setInteractive();
+        this.buttonScan.setInteractive();
+        this.button.on('pointerover', () => this.button.setStyle({fill: '#006db2'})).on('pointerout', () => this.button.setStyle({fill: '#fff'})).on('pointerdown', () => this.scene.start('preload'));
+        this.buttonScan.on('pointerdown', () => {
+            if (this.scannedObject) {
+                console.log(this.blockingObjects);
+                if (this.checkIfObjectBlocksViewline(this.blockingObjects)) {
+                    console.log('not in view');
+                    this.scanLineGfx.setVisible(false);
+                } else {
+                    this.scanLineGfx.setVisible(true);
+                }
+            }
+        });
+
+        this.buttonUp.on('pointerdown', () => {
+            this.score += 10;
+            this.scoreText.setText('Score: ' + this.score);
+            console.log(this.player);
+        });
+    }
+
+    checkIfObjectBlocksViewline(gameObject) {
+
+        if (gameObject.isParent) {
+            let intersects = gameObject.getChildren().every(element =>
+                Phaser.Geom.Intersects.LineToRectangle(this.scanLine, element.body) === false
+            );
+            return !intersects;
+        }
+
+    }
+
+    processCallback(obj1, obj2) {
 
         //  This function can perform your own additional checks on the 2 objects that collided.
         //  For example you could test for velocity, health, etc.
         //  This function needs to return either true or false. If it returns true then collision carries on (separating the two objects).
         //  If it returns false the collision is assumed to have failed and aborts, no further checks or separation happen.
 
-        if (obj1.body)
-        {
+        if (obj1.body) {
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
 
@@ -234,6 +270,25 @@ class GameScene extends Scene {
     }
 
     update() {
+        if (!this.scannedObject) {
+            this.scanLineGfx.setVisible(false);
+        }
+        this.scanCircle.setPosition(this.player.x, this.player.y)
+        this.scanLine.setTo(this.player.x, this.player.y, this.blueStar.x, this.blueStar.y)
+        this.scanGfx
+            .clear()
+            .strokeCircleShape(this.scanCircle).strokeRectShape(this.testBlockRect);
+        ;
+        this.scanLineGfx.clear().strokeLineShape(this.scanLine);
+        if (this.objectToScanFor) {
+            if (Phaser.Geom.Intersects.CircleToRectangle(this.scanCircle, this.objectToScanFor)) {
+                this.scannedObject = true;
+                this.scanGfx.lineStyle(2, 0xff0000);
+            } else {
+                this.scannedObject = false;
+            }
+            ;
+        }
         if (this.player.active) {
             if (this.objectCollidedWith.active) {
 
@@ -265,65 +320,21 @@ class GameScene extends Scene {
                 ;
 
 
-                // if (closest.body && collided) {
-                //     console.log(distCheb);
-                //     if ((distCheb + closest.body.halfHeight) < distClosest) {
-                //         console.log("distChev < halfHeight")
-                //         this.physics.pause();
-                //         player.angle = 0;
-                //     }
-                // }
                 this.gfx.clear()
                     .lineStyle(2, 0xff3300)
                     .lineBetween(this.objectCollidedWith.x, this.objectCollidedWith.y, this.player.x, this.player.y);
-                this.gfxDir = this.add.graphics().setDefaultStyles({
-                    lineStyle: {
-                        width: 10,
-                        color: 0xffdd00,
-                        alpha: 0.5
-                    }
-                });
-                var dist = Phaser.Math.Distance.BetweenPoints(this.player, this.blueStar);
-                if (dist < 100) {
-                    console.log("platform detected");
-                    this.physics.accelerateToObject(this.player, this.blueStar, 4000);
-                }
-                // this.physics.velocityFromRotation(player.rotation, player.body.maxSpeed, player.body.acceleration);
 
-// player.setCircle(50);
-//         console.log(player.angle + ":" + Phaser.Math.RadToDeg(player.rotation));
-                // player.angle += 0.5
-                // if (collided) {
-                //     console.log("collided");
-                //     console.log(player.body.blocked);
-                //
-                // }
+
             }
-            this.statusText.setText('  right clear: ' + this.rightIsClear + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
+            this.statusText.setText('  right clear: ' + this.rightIsClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
 
-            // if (player.body.touching.none) {
-            //     value = '';
-            //     collided = false;
-            //
-            //     player.setVelocityX(0);
-            //     player.setVelocityY(0);
-            // }
+
             if (playGame) {
                 eval(code);
                 this.physics.velocityFromAngle(this.rotation, this.player.body.maxSpeed, this.player.body.acceleration);
                 try {
 
-                    // eval(code);
 
-                    // value = '';
-                    // eval(listBlock.next().value);
-                    // let firstBlock = blockListTmp.shift();
-                    //
-                    // console.log("firstBlock");
-                    // console.log(firstBlock);
-                    // console.log("blockList");
-                    // console.log(blockList.length);
-                    // playBlocks.next(firstBlock);
                 } catch (error) {
                     console.log(error);
                 }
@@ -332,24 +343,20 @@ class GameScene extends Scene {
         }
 
         if (this.cursors.space.isDown) {
-            // this.physics.velocityFromAngle(player.body.rotation, player.body.maxSpeed, player.body.acceleration);
-            // console.log(player);
-            // player.setVelocityX(0);
-            // player.setVelocityY(0);
             this.physics.pause();
             this.objectCollidedWith = null;
             this.scene.restart();
 
         }
 
-        if (this.cursors.left.isDown || this.value === 'LEFT') {
+        if (this.cursors.left.isDown || this.direction === 'LEFT') {
             this.rotation = this.ROTATION_LEFT;
-            this.player.setVelocityX(-160);
+            // this.player.setVelocityX(-160);
             this.player.setVelocityY(0);
             this.player.anims.play('left', true);
-        } else if (this.cursors.right.isDown || this.value === 'RIGHT') {
+        } else if (this.cursors.right.isDown || this.direction === 'RIGHT') {
             this.rotation = this.ROTATION_RIGHT;
-            this.player.setVelocityX(160);
+            // this.player.setVelocityX(160);
             this.player.setVelocityY(0);
             this.player.anims.play('right', true);
         } else {
@@ -358,20 +365,20 @@ class GameScene extends Scene {
             this.player.anims.play('turn');
         }
 
-        if (this.cursors.up.isDown || this.value === 'UP') {
+        if (this.cursors.up.isDown || this.direction === 'UP') {
             this.rotation = this.ROTATION_UP;
             this.player.setVelocityX(0);
-            this.player.setVelocityY(-160);
-        } else if (this.cursors.down.isDown || this.value === 'DOWN') {
+            // this.player.setVelocityY(-160);
+        } else if (this.cursors.down.isDown || this.direction === 'DOWN') {
             this.rotation = this.ROTATION_DOWN;
             this.player.setVelocityX(0);
-            this.player.setVelocityY(160);
+            // this.player.setVelocityY(160);
         } else {
             // player.setVelocityY(0);
         }
 // playGame = false;
-        if (this.value == 'STOP') {
-            // player.setVelocityX(0);
+        if (this.direction == 'TO_OBJECT') {
+            this.physics.accelerateToObject(this.player, this.blueStar, 4000);
             // player.setVelocityY(0);
         }
     }

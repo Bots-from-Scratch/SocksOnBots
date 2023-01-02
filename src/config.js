@@ -14,7 +14,7 @@ const config = {
             debug: true
         }
     },
-    scene: [PreloadScene, GameScene]
+    scene: [GameScene, PreloadScene ]
 };
 
 export {config}

@@ -1,13 +1,15 @@
 import Phaser from 'phaser';
 import css from "./style.css";
-import './move_player';
-import './walked_around';
-import './direction_blocked';
-import './direction_clear';
+import './blockly/blocks/move_player';
+import './blockly/blocks/walked_around';
+import './blockly/blocks/direction_blocked';
+import './blockly/blocks/direction_clear';
+import './blockly/blocks/object_sock';
+import './blockly/blocks/scan_for_object';
+import './blockly/blocks/bool_sighted';
 import {JavaScript} from "blockly";
 import GameScene from "./GameScene";
 import {config} from "./config";
-
 
 
 var playGame = false;
@@ -16,60 +18,6 @@ var blockList = [];
 let blockListTmp;
 let code;
 
-var json = {
-    "blocks": {
-        "languageVersion": 0,
-        "blocks": [
-            {
-                "type": "controls_if",
-                "id": "e3H5^8+HCBJ01_e1Y1Zg",
-                "x": 24,
-                "y": 113,
-                "extraState": {
-                    "elseIfCount": 1
-                },
-                "inputs": {
-                    "IF0": {
-                        "block": {
-                            "type": "direction_clear",
-                            "id": "P4RJHTCTGtoLT}5556^c",
-                            "fields": {
-                                "NAME": "RIGHT_CLEAR"
-                            }
-                        }
-                    },
-                    "DO0": {
-                        "block": {
-                            "type": "move_player",
-                            "id": "iHHZ{bU1f9Tc-;I8JGRB",
-                            "fields": {
-                                "VALUE": "RIGHT"
-                            }
-                        }
-                    },
-                    "IF1": {
-                        "block": {
-                            "type": "direction_blocked",
-                            "id": "]]f;q$$:gA:vFWTr(pIH",
-                            "fields": {
-                                "NAME": "RIGHT_BLOCKED"
-                            }
-                        }
-                    },
-                    "DO1": {
-                        "block": {
-                            "type": "move_player",
-                            "id": "GNq:N,Y2H))*GE1P9ex1",
-                            "fields": {
-                                "VALUE": "DOWN"
-                            }
-                        }
-                    }
-                }
-            }
-        ]
-    }
-};
 
 (function () {
 
@@ -94,8 +42,6 @@ var json = {
         // });
         console.log("blockList");
         console.log(blockList);
-        console.log(GameScene.this.player);
-
     }
 
     function save(button) {
@@ -184,12 +130,36 @@ var json = {
                 'kind': 'block',
                 'type': 'direction_clear'
             },
+            {
+                'kind': 'block',
+                'type': 'object_sock'
+            },
+            {
+                'kind': 'block',
+                'type': 'scan_for_object'
+            },
+            {
+                'kind': 'block',
+                'type': 'bool_sighted'
+            },
         ],
     };
 
     Blockly.inject('blocklyDiv', {
-        toolbox: toolbox,
-        scrollbars: false,
+        toolbox : toolbox,
+        collapse : true,
+        comments : true,
+        disable : true,
+        maxBlocks : Infinity,
+        trashcan : true,
+        horizontalLayout : false,
+        toolboxPosition : 'start',
+        css : true,
+        media : 'https://blockly-demo.appspot.com/static/media/',
+        rtl : false,
+        scrollbars : true,
+        sounds : true,
+        oneBasedIndex : true
     });
 
 })();
