@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import GameScene from "./GameScene";
+import GameScene from "./scenes/GameScene";
 import CreditScene from "./scenes/menu/CreditScene";
 import OptionScene from "./scenes/menu/OptionScene";
 import MenuScene from "./scenes/menu/MenuScene";

@@ -5,7 +5,7 @@ import './walked_around';
 import './direction_blocked';
 import './direction_clear';
 import {JavaScript} from "blockly";
-import GameScene from "./GameScene";
+import GameScene from "./scenes/GameScene";
 import {config} from "./config";
 
 
