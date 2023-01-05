@@ -5,8 +5,8 @@ import PreloadScene from "./PreloadScene";
 const config = {
     type: Phaser.AUTO,
     parent: 'phaser-example',
-    width: 800,
-    height: 600,
+    width: 960,
+    height: 640,
     physics: {
         default: 'arcade',
         arcade: {
@@ -14,7 +14,8 @@ const config = {
             debug: true
         }
     },
-    scene: [GameScene, PreloadScene ]
+    pixelArt: true,
+    scene: [GameScene, PreloadScene],
 };
 
 export {config}

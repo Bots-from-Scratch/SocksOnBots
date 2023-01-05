@@ -16,3 +16,6 @@ dist/
 
 # Allow following paths/files
 !.vscode/extensions.json
+/src/assets/sock-on-bots64.tmx
+/src/assets/sock-on-bots.tmx
+/src/assets/CosmicLilac_Tiles_64x64.tsx

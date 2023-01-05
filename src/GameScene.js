@@ -4,6 +4,8 @@ import platform from "./assets/platform.png";
 import star from "./assets/star.png";
 import bomb from "./assets/bomb.png";
 import dude from "./assets/dude.png";
+import tilemap from "./assets/sock-on-bots64.json";
+import tileset from "./assets/CosmicLilac_Tiles_64x64.png";
 import {code, playGame} from "./index";
 
 class GameScene extends Scene {
@@ -49,17 +51,36 @@ class GameScene extends Scene {
     }
 
     preload() {
-        this.load.image('sky', sky);
+        // this.load.image('sky', sky);
+        this.load.image('tileset', tileset);
         this.load.image('ground', platform);
         this.load.image('star', star);
         this.load.image('bomb', bomb);
         this.load.spritesheet('dude', dude, {frameWidth: 32, frameHeight: 48});
+        this.load.tilemapTiledJSON('map', tilemap);
     }
 
     create() {
-        this.add.image(400, 300, 'sky');
+        // this.add.image(400, 300, 'sky');
+        const map = this.make.tilemap({key: 'map'});
 
-        this.createPlatforms();
+
+        const tileset = map.addTilesetImage('CosmicLilac_Tiles_64x64', 'tileset');
+        const backgroundLayer = map.createLayer('background', tileset, 0, 0);
+        const groundLayer = map.createLayer('ground', tileset, 0, 0);
+        const wallLayer = map.createLayer('walls', tileset, 0, 0);
+
+        wallLayer.setCollisionByProperty({collision: true});
+        map.setBaseTileSize(64, 64);
+
+
+        // const debugGraphics = this.add.graphics().setAlpha(0.5);
+        // wallLayer.renderDebug(debugGraphics, {
+        //     tileColor: null,
+        //     collidingTileColor: new Phaser.Display.Color(255, 255, 50, 255)
+        // });
+
+        // this.createPlatforms();
         this.createPlayer();
         this.createCursor();
         this.createStar();
@@ -67,8 +88,7 @@ class GameScene extends Scene {
 
         this.scoreText = this.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#fff'});
 
-
-
+        this.physics.add.collider(this.player, wallLayer);
 
 
         this.statusText = this.add.text(16, 50, 'Speed: ' + this.player.velocity + 'Angle: ' + this.player.body.rotation, {
@@ -132,10 +152,10 @@ class GameScene extends Scene {
     }
 
     createPlayer() {
-        this.player = this.physics.add.sprite(100, 100, 'dude');
+        this.player = this.physics.add.sprite(150, 150, 'dude').setScale(1.8);
         // this.player.body.bounce.set(1);
         this.player.body.setMaxSpeed(160);
-        this.player.setCircle(20, -4, 10);
+        this.player.setCircle(14, 2, 24);
         this.physics.add.collider(this.player, this.platforms, function (_player, _platform) {
             this.objectCollidedWith = _platform;
             this.collided = true;
@@ -189,7 +209,7 @@ class GameScene extends Scene {
     }
 
     createStar() {
-        this.blueStar = this.physics.add.sprite(500, 100, 'star');
+        this.blueStar = this.physics.add.sprite(800, 100, 'star');
         this.blueStar.setTint(0x006db2);
 
         this.physics.add.overlap(this.player, this.blueStar, this.collectStar, null, this);
@@ -282,7 +302,8 @@ class GameScene extends Scene {
         Phaser.Geom.Line.SetToAngle(this.scanLineRot, this.player.x, this.player.y, this.scanAngle, 200);
         if (Phaser.Geom.Intersects.LineToRectangle(this.scanLineRot, this.blueStar) && this.scannedObject) {
             this.objectSighted = true;
-        };
+        }
+        ;
         this.scanGfx
             .clear()
             .strokeCircleShape(this.scanCircle).strokeRectShape(this.testBlockRect).strokeLineShape(this.scanLineRot);
