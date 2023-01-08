@@ -7,8 +7,8 @@ import MenuScene from "./scenes/menu/MenuScene";
 const config = {
     type: Phaser.AUTO,
     parent: 'phaser-example',
-    width: 800,
-    height: 600,
+    width: 960,
+    height: 640,
     physics: {
         default: 'arcade',
         arcade: {
@@ -16,7 +16,8 @@ const config = {
             debug: true
         }
     },
+    pixelArt: true,
     scene: [MenuScene, GameScene, OptionScene, CreditScene]
 };
 
-export {config}
+export { config }
