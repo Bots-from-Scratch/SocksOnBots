@@ -1,10 +1,10 @@
 import {Scene} from 'phaser';
-import sky from "./assets/sky.png";
-import platform from "./assets/platform.png";
-import star from "./assets/star.png";
-import bomb from "./assets/bomb.png";
-import dude from "./assets/dude.png";
-import {code, playGame} from "./index";
+import sky from "../assets/sky.png";
+import platform from "../assets/platform.png";
+import star from "../assets/star.png";
+import bomb from "../assets/bomb.png";
+import dude from "../assets/dude.png";
+import {code, playGame} from "../index";
 
 class GameScene extends Scene {
     ROTATION_RIGHT = 0;
@@ -60,11 +60,9 @@ class GameScene extends Scene {
 
         this.button = this.add.text(95, 400, 'Back to Menu');
         this.buttonUp = this.add.text(600, 400, 'Increase Score');
-        this.button.setInteractive();
+        this.button.setInteractive().on('pointerover', () => this.button.setTint(0x006db2)).on('pointerdown', () => this.scene.start('menu'));
+        
         this.buttonUp.setInteractive();
-        this.button.on('pointerover', () => this.button.setTint(0x006db2));
-        this.button.on('pointerdown', () => this.scene.start('preload'));
-
         this.buttonUp.on('pointerdown', () => {
             this.score += 10;
             this.scoreText.setText('Score: ' + this.score);

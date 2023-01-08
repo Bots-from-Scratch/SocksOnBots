@@ -1,6 +1,8 @@
 import Phaser from "phaser";
-import GameScene from "./GameScene";
-import PreloadScene from "./PreloadScene";
+import GameScene from "./scenes/GameScene";
+import CreditScene from "./scenes/menu/CreditScene";
+import OptionScene from "./scenes/menu/OptionScene";
+import MenuScene from "./scenes/menu/MenuScene";
 
 const config = {
     type: Phaser.AUTO,
@@ -14,7 +16,7 @@ const config = {
             debug: true
         }
     },
-    scene: [PreloadScene, GameScene]
+    scene: [MenuScene, GameScene, OptionScene, CreditScene]
 };
 
 export {config}
