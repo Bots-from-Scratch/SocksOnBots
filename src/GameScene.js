@@ -1,11 +1,11 @@
 import {Scene} from 'phaser';
 import sky from "./assets/sky.png";
 import platform from "./assets/platform.png";
-import star from "./assets/star.png";
+import star from "./assets/sock_sprite.png";
 import bomb from "./assets/bomb.png";
 import dude from "./assets/dude.png";
 import tilemap from "./assets/sock-on-bots64.json";
-import tileset from "./assets/CosmicLilac_Tiles_64x64.png";
+import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
 import {code, playGame} from "./index";
 
 class GameScene extends Scene {
@@ -80,7 +80,7 @@ class GameScene extends Scene {
         //     collidingTileColor: new Phaser.Display.Color(255, 255, 50, 255)
         // });
 
-        // this.createPlatforms();
+        this.createPlatforms();
         this.createPlayer();
         this.createCursor();
         this.createStar();
@@ -126,7 +126,7 @@ class GameScene extends Scene {
         });
         this.scanLineGfx.setVisible(false);
 
-        this.testBlockRect = new Phaser.Geom.Rectangle(200, 50, 100, 200);
+        // this.testBlockRect = new Phaser.Geom.Rectangle(200, 50, 100, 200);
         this.scanCircle = new Phaser.Geom.Circle(300, 400, this.SCAN_DISTANCE);
         this.blockingObjects = this.platforms;
     }
@@ -138,17 +138,17 @@ class GameScene extends Scene {
     createPlatforms() {
         this.platforms = this.physics.add.staticGroup();
 
-        this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        this.platforms.create(300, 100, 'ground').setScale(0.3, 5).refreshBody();
+        // this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+        this.platforms.create(512, 128, 'ground').setScale(0.66, 8.1).setAlpha(0).refreshBody();
 
 
-        this.platforms.create(600, 400, 'ground');
-        this.platforms.create(50, 250, 'ground');
-        this.platforms.create(750, 220, 'ground');
+        this.platforms.create(864, 288, 'ground').setScale(0.5,6).setAlpha(0).refreshBody();
+        // this.platforms.create(50, 250, 'ground');
+        // this.platforms.create(750, 220, 'ground');
 
         // platforms.setSize(400, 50, true);
 
-        this.platforms.setTint(0x000bbb);
+        // this.platforms.setTint(0x000bbb);
     }
 
     createPlayer() {
@@ -210,7 +210,7 @@ class GameScene extends Scene {
 
     createStar() {
         this.blueStar = this.physics.add.sprite(800, 100, 'star');
-        this.blueStar.setTint(0x006db2);
+        // this.blueStar.setTint(0x006db2);
 
         this.physics.add.overlap(this.player, this.blueStar, this.collectStar, null, this);
     }
@@ -306,7 +306,7 @@ class GameScene extends Scene {
         ;
         this.scanGfx
             .clear()
-            .strokeCircleShape(this.scanCircle).strokeRectShape(this.testBlockRect).strokeLineShape(this.scanLineRot);
+            .strokeCircleShape(this.scanCircle).strokeLineShape(this.scanLineRot);
         ;
         this.scanLineGfx.clear().strokeLineShape(this.scanLine);
         if (this.objectToScanFor) {
