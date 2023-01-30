@@ -1,11 +1,11 @@
 import {Scene} from 'phaser';
 import sky from "./assets/sky.png";
 import platform from "./assets/platform.png";
-import star from "./assets/star.png";
+import star from "./assets/socke.png";
 import bomb from "./assets/bomb.png";
 import dude from "./assets/dude.png";
 import tilemap from "./assets/sock-on-bots64.json";
-import tileset from "./assets/CosmicLilac_Tiles_64x64.png";
+import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
 import {code, playGame} from "./index";
 
 class GameScene extends Scene {
@@ -28,13 +28,13 @@ class GameScene extends Scene {
         this.walkedBy = false;
 
         this.value;
-        var codeFromBlock;
-        var blockList = [];
-
-
-        let gameTick = 0;
-        let blockListTmp;
-        let code;
+        // let codeFromBlock;
+        // let blockList = [];
+        //
+        //
+        // let gameTick = 0;
+        // let blockListTmp;
+        // let code;
         this.collided = false;
 
         this.rightIsClear = true;
@@ -80,13 +80,14 @@ class GameScene extends Scene {
         //     collidingTileColor: new Phaser.Display.Color(255, 255, 50, 255)
         // });
 
-        // this.createPlatforms();
+        this.createPlatforms();
         this.createPlayer();
         this.createCursor();
         this.createStar();
         this.createButtons();
 
         this.scoreText = this.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#fff'});
+        this.scoreText.setVisible(false);
 
         this.physics.add.collider(this.player, wallLayer);
 
@@ -95,11 +96,13 @@ class GameScene extends Scene {
             fontSize: '16px',
             fill: '#fff'
         });
-        this.gfx = this.add.graphics();
-        this.bombs = this.physics.add.group();
+        this.statusText.setVisible(false);
 
-        this.physics.add.collider(this.bombs, this.platforms);
-        this.physics.add.collider(this.player, this.bombs);
+        this.gfx = this.add.graphics();
+        // this.bombs = this.physics.add.group();
+
+        // this.physics.add.collider(this.bombs, this.platforms);
+        // this.physics.add.collider(this.player, this.bombs);
 
 
         // this.physics.add.collider(stars, platforms);
@@ -108,16 +111,21 @@ class GameScene extends Scene {
         this.physics.world.on('worldbounds', (body) => {
             this.collided = true;
         });
+
         this.graphic = this.add.graphics({lineStyle: {color: 0x00ffff}});
         this.graphic.setVisible(false);
+
         this.scanGfx = this.add.graphics({
             fillStyle: {
                 color: 0x00ffff,
                 alpha: 0.5
             }
         });
+        this.scanGfx.setVisible(false);
         this.scanLine = new Phaser.Geom.Line(this.player.x, this.player.y, this.blueStar.x, this.blueStar.y);
+
         this.scanLineRot = new Phaser.Geom.Line(this.player.x, this.player.y, 300, 100);
+
         this.scanLineGfx = this.add.graphics({
             fillStyle: {
                 color: 0x00ffff,
@@ -126,7 +134,7 @@ class GameScene extends Scene {
         });
         this.scanLineGfx.setVisible(false);
 
-        this.testBlockRect = new Phaser.Geom.Rectangle(200, 50, 100, 200);
+        // this.testBlockRect = new Phaser.Geom.Rectangle(200, 50, 100, 200);
         this.scanCircle = new Phaser.Geom.Circle(300, 400, this.SCAN_DISTANCE);
         this.blockingObjects = this.platforms;
     }
@@ -138,17 +146,17 @@ class GameScene extends Scene {
     createPlatforms() {
         this.platforms = this.physics.add.staticGroup();
 
-        this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        this.platforms.create(300, 100, 'ground').setScale(0.3, 5).refreshBody();
+        // this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+        this.platforms.create(512, 128, 'ground').setScale(0.66, 8.1).setAlpha(0).refreshBody();
 
 
-        this.platforms.create(600, 400, 'ground');
-        this.platforms.create(50, 250, 'ground');
-        this.platforms.create(750, 220, 'ground');
+        this.platforms.create(864, 288, 'ground').setScale(0.5,6).setAlpha(0).refreshBody();
+        // this.platforms.create(50, 250, 'ground');
+        // this.platforms.create(750, 220, 'ground');
 
         // platforms.setSize(400, 50, true);
 
-        this.platforms.setTint(0x000bbb);
+        // this.platforms.setTint(0x000bbb);
     }
 
     createPlayer() {
@@ -210,18 +218,19 @@ class GameScene extends Scene {
 
     createStar() {
         this.blueStar = this.physics.add.sprite(800, 100, 'star');
-        this.blueStar.setTint(0x006db2);
+        // this.blueStar.setTint(0x006db2);
+        this.blueStar.setScale(0.4);
 
         this.physics.add.overlap(this.player, this.blueStar, this.collectStar, null, this);
     }
 
     createButtons() {
-        this.button = this.add.text(95, 400, 'Back to Menu');
+        this.button = this.add.text(40, 600, 'Back to Menu');
         this.buttonUp = this.add.text(600, 400, 'Increase Score');
         this.buttonScan = this.add.text(600, 450, 'Scan For Star');
         this.button.setInteractive();
-        this.buttonUp.setInteractive();
-        this.buttonScan.setInteractive();
+        this.buttonUp.setInteractive().setVisible(false);
+        this.buttonScan.setInteractive().setVisible(false);
         this.button.on('pointerover', () => this.button.setStyle({fill: '#006db2'})).on('pointerout', () => this.button.setStyle({fill: '#fff'})).on('pointerdown', () => this.scene.start('preload'));
         this.buttonScan.on('pointerdown', () => {
             if (this.scannedObject) {
@@ -303,11 +312,11 @@ class GameScene extends Scene {
         if (Phaser.Geom.Intersects.LineToRectangle(this.scanLineRot, this.blueStar) && this.scannedObject) {
             this.objectSighted = true;
         }
-        ;
+
         this.scanGfx
             .clear()
-            .strokeCircleShape(this.scanCircle).strokeRectShape(this.testBlockRect).strokeLineShape(this.scanLineRot);
-        ;
+            .strokeCircleShape(this.scanCircle).strokeLineShape(this.scanLineRot);
+
         this.scanLineGfx.clear().strokeLineShape(this.scanLine);
         if (this.objectToScanFor) {
             if (Phaser.Geom.Intersects.CircleToRectangle(this.scanCircle, this.objectToScanFor)) {
@@ -316,14 +325,17 @@ class GameScene extends Scene {
             } else {
                 this.scannedObject = false;
             }
-            ;
+
         }
+        let distCheb;
+        let distClosest;
+        let hypot;
         if (this.player.active) {
             if (this.objectCollidedWith.active) {
 
-                var distCheb = Phaser.Math.RoundTo(Phaser.Math.Distance.Chebyshev(this.player.x, this.player.y, this.objectCollidedWith.x, this.objectCollidedWith.y), 0);
-                var distClosest = Phaser.Math.RoundTo(Phaser.Math.Distance.BetweenPoints(this.player, this.objectCollidedWith), 0);
-                var hypot = Math.hypot(this.player.body.halfHeight + this.objectCollidedWith.body.halfHeight, this.player.body.halfWidth + this.objectCollidedWith.body.halfWidth);
+                distCheb = Phaser.Math.RoundTo(Phaser.Math.Distance.Chebyshev(this.player.x, this.player.y, this.objectCollidedWith.x, this.objectCollidedWith.y), 0);
+                distClosest = Phaser.Math.RoundTo(Phaser.Math.Distance.BetweenPoints(this.player, this.objectCollidedWith), 0);
+                hypot = Math.hypot(this.player.body.halfHeight + this.objectCollidedWith.body.halfHeight, this.player.body.halfWidth + this.objectCollidedWith.body.halfWidth);
 
 
                 // console.log(distClosest);
@@ -339,14 +351,14 @@ class GameScene extends Scene {
                     } else if (this.player.body.y - this.player.body.prev.y !== 0 && (this.rotation === 90 || this.rotation === -90)) {
                         this.walkedBy = true;
                     }
-                    ;
+
                     // this.physics.accelerateToObject(player, blueStar, 4000);
                 }
 
                 this.graphic
                     .clear()
                     .strokeCircle(this.player.x, this.player.y, distClosest).strokeRect(this.player.x - distCheb, this.player.y - distCheb, 2 * distCheb, 2 * distCheb);
-                ;
+
 
 
                 this.gfx.clear()
