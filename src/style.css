@@ -9,14 +9,14 @@ canvas {
     min-width: 50%;
 }
 
-main {
-    display: flex;
-    flex-direction: column;
-    width: 400px;
-    position: relative;
-    margin: 0 auto;
-    overflow:hidden;
-}
+/*main {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    width: 400px;*/
+/*    position: relative;*/
+/*    margin: 0 auto;*/
+/*    overflow:hidden;*/
+/*}*/
 
 header {
     background-color: green;
@@ -32,44 +32,44 @@ h1 {
     line-height: 2.4em;
 }
 
-.mode-edit,
-.mode-maker,
-.mode-blockly {
-    display: none;
-}
+/*.mode-edit,*/
+/*.mode-maker,*/
+/*.mode-blockly {*/
+/*    display: none;*/
+/*}*/
 
-[mode="maker"] .mode-maker,
-[mode="edit"] .mode-edit,
-[mode="blockly"] .mode-blockly {
-    display: block;
-}
+/*[mode="maker"] .mode-maker,*/
+/*[mode="edit"] .mode-edit,*/
+/*[mode="blockly"] .mode-blockly {*/
+/*    display: block;*/
+/*}*/
 
-.blockly-editor {
-    position: absolute;
-    top: 120px;
-    left: -400px;
-    transition: left .4s;
-    height: 460px;
-    width: 400px;
-    background-color: #eee;
-}
+/*.blockly-editor {*/
+/*    position: absolute;*/
+/*    top: 120px;*/
+/*    left: -400px;*/
+/*    transition: left .4s;*/
+/*    height: 460px;*/
+/*    width: 400px;*/
+/*    background-color: #eee;*/
+/*}*/
 
-[mode="blockly"] .blockly-editor {
-    left: 0;
-}
+/*[mode="blockly"] .blockly-editor {*/
+/*    left: 0;*/
+/*}*/
 
-.maker {
-    display: flex;
-    flex-flow: column;
-    justify-content: space-between;
-    height: 460px;
-    width: 400px;
-}
+/*.maker {*/
+/*    display: flex;*/
+/*    flex-flow: column;*/
+/*    justify-content: space-between;*/
+/*    height: 460px;*/
+/*    width: 400px;*/
+/*}*/
 
-.maker > div {
-    display: flex;
-    justify-content: space-between;
-}
+/*.maker > div {*/
+/*    display: flex;*/
+/*    justify-content: space-between;*/
+/*}*/
 
 .button {
     width: 120px;
@@ -87,5 +87,5 @@ h1 {
 }
 
 .mdl-color--amber-500 {
-    background-color: aqua;
+    background-color: darkslategray;
 }
