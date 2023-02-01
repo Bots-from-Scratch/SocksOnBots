@@ -2,6 +2,7 @@ const {merge} = require("webpack-merge");
 const path = require("path");
 const base = require("./base");
 const TerserPlugin = require("terser-webpack-plugin");
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 module.exports = merge(base, {
   mode: "production",
@@ -13,6 +14,7 @@ module.exports = merge(base, {
     maxEntrypointSize: 900000,
     maxAssetSize: 900000
   },
+  plugins: [new ESLintPlugin()],
   optimization: {
     minimizer: [
       new TerserPlugin({
