@@ -1,12 +1,12 @@
 import {Scene} from 'phaser';
-import sky from "./assets/sky.png";
-import platform from "./assets/platform.png";
-import star from "./assets/star.png";
-import bomb from "./assets/bomb.png";
-import dude from "./assets/dude.png";
-import tilemap from "./assets/sock-on-bots64.json";
-import tileset from "./assets/CosmicLilac_Tiles_64x64.png";
-import {code, playGame} from "./index";
+import sky from "../assets/sky.png";
+import platform from "../assets/platform.png";
+import star from "../assets/star.png";
+import bomb from "../assets/bomb.png";
+import dude from "../assets/dude.png";
+import tilemap from "../assets/sock-on-bots64.json";
+import tileset from "../assets/CosmicLilac_Tiles_64x64.png";
+import {code, playGame} from "../index";
 
 class GameScene extends Scene {
     ROTATION_RIGHT = 0;
