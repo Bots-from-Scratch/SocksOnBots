@@ -1,7 +1,7 @@
 Blockly.common.defineBlocksWithJsonArray([
     {
         "type": "move_player",
-        "message0": "Move %1 %2",
+        "message0": "Move %1",
         "args0": [
             {
                 "type": "field_dropdown",
@@ -28,10 +28,6 @@ Blockly.common.defineBlocksWithJsonArray([
                         "TO_OBJECT"
                     ]
                 ]
-            },
-            {
-                "type": "input_value",
-                "name": "Move"
             }
         ],
         "previousStatement": null,
@@ -39,7 +35,7 @@ Blockly.common.defineBlocksWithJsonArray([
         "colour": 355,
         "tooltip": "",
         "helpUrl": ""
-    },
+    }
 ]);
 
 
