@@ -13,6 +13,7 @@ node_modules/
 # Build
 dist/
 /npm-debug.log
+dist.zip
 
 # Allow following paths/files
 !.vscode/extensions.json
