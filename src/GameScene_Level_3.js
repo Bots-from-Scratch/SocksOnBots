@@ -3,11 +3,11 @@ import platform from "./assets/platform.png";
 import star from "./assets/socke.png";
 import bomb from "./assets/bomb.png";
 import bot_sock from "./assets/Spritesheet.png"
-import level_1 from "./assets/SocksOnBots_lvl_1.json";
+import level_3 from "./assets/SocksOnBots_lvl_3.json";
 import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
 import {code, playGame} from "./index";
 
-class GameScene extends Scene {
+class GameScene_Level_1 extends Scene {
     ROTATION_RIGHT = 0;
     ROTATION_LEFT = 180;
     ROTATION_UP = -90;
@@ -58,7 +58,7 @@ class GameScene extends Scene {
         this.load.image('star', star);
         this.load.image('bomb', bomb);
         this.load.spritesheet('bot', bot_sock, {frameWidth: 64, frameHeight: 64});
-        this.load.tilemapTiledJSON('map', level_1);
+        this.load.tilemapTiledJSON('map', level_3);
     }
 
     create() {
@@ -579,4 +579,4 @@ class GameScene extends Scene {
     }
 }
 
-export default GameScene
+export default GameScene_Level_1

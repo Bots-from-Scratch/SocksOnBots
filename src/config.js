@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import GameScene from "./GameScene";
+import GameScene_Level_1 from "./GameScene_Level_1";
 import PreloadScene from "./PreloadScene";
 
 const config = {
@@ -15,7 +15,7 @@ const config = {
         }
     },
     pixelArt: true,
-    scene: [GameScene, PreloadScene],
+    scene: [GameScene_Level_1, PreloadScene],
 };
 
 export {config}

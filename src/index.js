@@ -8,7 +8,7 @@ import './blockly/blocks/object_sock';
 import './blockly/blocks/scan_for_object';
 import './blockly/blocks/bool_sighted';
 import {JavaScript} from "blockly";
-import GameScene from "./GameScene";
+import GameScene_Level_1 from "./GameScene_Level_1";
 import {config} from "./config";
 
 
