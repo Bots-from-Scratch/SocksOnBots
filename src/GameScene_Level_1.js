@@ -172,14 +172,14 @@ class GameScene_Level_1 extends Scene {
     }
 
     createPlayer() {
-        this.player = this.physics.add.sprite(150, 150, 'bot').setScale(1);
+        this.player = this.physics.add.sprite(150, 150, 'bot').setScale(1.4);
         if (this.level === 1) {
             this.player.setX(480).setY(600);
         }
         ;
         // this.player.body.bounce.set(1);
         this.player.body.setMaxSpeed(160);
-        this.player.setCircle(14, 2, 24);
+        this.player.setCircle(20, 12, 28);
         this.physics.add.collider(this.player, this.platforms, function (_player, _platform) {
             this.objectCollidedWith = _platform;
             this.collided = true;
@@ -327,7 +327,7 @@ class GameScene_Level_1 extends Scene {
         this.button.setInteractive();
         this.buttonUp.setInteractive().setVisible(false);
         this.buttonScan.setInteractive().setVisible(false);
-        this.button.on('pointerover', () => this.button.setStyle({fill: '#006db2'})).on('pointerout', () => this.button.setStyle({fill: '#fff'})).on('pointerdown', () => this.scene.start('preload'));
+        this.button.on('pointerover', () => this.button.setStyle({fill: '#006db2'})).on('pointerout', () => this.button.setStyle({fill: '#fff'})).on('pointerdown', () => this.scene.start('PreloadScene'));
         this.buttonScan.on('pointerdown', () => {
             if (this.scannedObject) {
                 console.log(this.blockingObjects);
@@ -395,9 +395,10 @@ class GameScene_Level_1 extends Scene {
     }
 
     checkForWin() {
-        if (this.player.x >= 470 && this.player.x <= 490 && this.player.y === 8) {
+        if (this.player.x >= 470 && this.player.x <= 490 && this.player.y === 5.6) {
             this.physics.pause();
             this.scoreText.setVisible(true);
+
         }
     }
 

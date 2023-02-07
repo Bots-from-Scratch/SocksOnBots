@@ -1,9 +1,9 @@
-body {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-}
+/*body {*/
+/*    display: flex;*/
+/*    flex-direction: row;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*}*/
 
 canvas {
     min-width: 50%;
@@ -18,29 +18,25 @@ canvas {
 /*    overflow:hidden;*/
 /*}*/
 
-header {
-    /*background-color: #15A99C;*/
-    width: 100%;
-}
+/*header {*/
+/*    !*background-color: #15A99C;*!*/
+/*    width: 100%;*/
+/*}*/
 
-.pixelart-to-css {
-    box-shadow: 60px 50px 0 0 rgba(0, 0, 0, 1), 70px 50px 0 0 rgba(0, 0, 0, 1), 80px 50px 0 0 rgba(0, 0, 0, 1), 90px 50px 0 0 rgba(0, 0, 0, 1), 100px 50px 0 0 rgba(0, 0, 0, 1), 110px 50px 0 0 rgba(0, 0, 0, 1), 120px 50px 0 0 rgba(0, 0, 0, 1), 130px 50px 0 0 rgba(0, 0, 0, 1), 140px 50px 0 0 rgba(0, 0, 0, 1), 50px 60px 0 0 rgba(0, 0, 0, 1), 150px 60px 0 0 rgba(0, 0, 0, 1), 50px 70px 0 0 rgba(0, 0, 0, 1), 150px 70px 0 0 rgba(0, 0, 0, 1), 50px 80px 0 0 rgba(0, 0, 0, 1), 150px 80px 0 0 rgba(0, 0, 0, 1), 50px 90px 0 0 rgba(0, 0, 0, 1), 150px 90px 0 0 rgba(0, 0, 0, 1), 50px 100px 0 0 rgba(0, 0, 0, 1), 150px 100px 0 0 rgba(0, 0, 0, 1), 60px 110px 0 0 rgba(0, 0, 0, 1), 70px 110px 0 0 rgba(0, 0, 0, 1), 80px 110px 0 0 rgba(0, 0, 0, 1), 90px 110px 0 0 rgba(0, 0, 0, 1), 100px 110px 0 0 rgba(0, 0, 0, 1), 110px 110px 0 0 rgba(0, 0, 0, 1), 120px 110px 0 0 rgba(0, 0, 0, 1), 130px 110px 0 0 rgba(0, 0, 0, 1), 140px 110px 0 0 rgba(0, 0, 0, 1);
-    height: 10px;
-    width: 10px;
-}
 
-h1 {
-    width: 400px;
-    position: relative;
-    margin: 0 auto;
-    font-size: 1.8em;
-    line-height: 2.4em;
-}
 
-main {
-    display: flex;
-    flex-direction: column;
-}
+/*h1 {*/
+/*    width: 400px;*/
+/*    position: relative;*/
+/*    margin: 0 auto;*/
+/*    font-size: 1.8em;*/
+/*    line-height: 2.4em;*/
+/*}*/
+
+/*main {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*}*/
 
 /*.mode-edit,*/
 /*.mode-maker,*/
@@ -81,10 +77,10 @@ main {
 /*    justify-content: space-between;*/
 /*}*/
 
-button {
-    /*visibility: hidden;*/
-    display: none;
-}
+/*button {*/
+/*    !*visibility: hidden;*!*/
+/*    display: none;*/
+/*}*/
 
 .button {
     display: flex;

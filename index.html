@@ -3,24 +3,24 @@
 <head>
     <meta charset="utf-8">
     <title>SocksOnBots</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="flex flex-row justify-center shrink-0 flex-wrap m-8">
 
-<main>
-    <button class="mode-maker mdl-button" id="edit">Edit</button>
-    <button class="mode-edit mdl-button mdl-js-button" id="done">Done</button>
-    <button class="mode-blockly mdl-button mdl-js-button" id="save">Save</button>
+<main class="flex flex-column">
+    <!--    <button class="mode-maker mdl-button" id="edit">Edit</button>-->
+    <!--    <button class="mode-edit mdl-button mdl-js-button" id="done">Done</button>-->
+    <!--    <button class="mode-blockly mdl-button mdl-js-button" id="save">Save</button>-->
     <!--    <p class="hint mode-edit">Tap any button to edit its code. <br/>When complete, press Done.</p>-->
-    <div class="maker">
-        <div>
-            <div class="button mdl-color--amber-500">
-                <div class="button-text">Play</div>
-            </div>
+    <div>
+        <div class="button mdl-color--amber-500 cursor-pointer">
+            <div class="button-text">Play</div>
         </div>
-    </div>
 
-    <div class="blockly-editor">
-        <div id="blocklyDiv" style="height: 480px; width: 400px;"></div>
+
+        <div class="blockly-editor">
+            <div id="blocklyDiv" style="height: 520px; width: 480px;"></div>
+        </div>
     </div>
 </main>
 <script src="https://unpkg.com/blockly"></script>

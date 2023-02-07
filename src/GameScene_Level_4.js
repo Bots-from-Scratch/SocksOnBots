@@ -6,8 +6,7 @@ import bot_sock from "./assets/Spritesheetohnesocke.png"
 import bot_with_sock from "./assets/Spritesheet.png"
 import level_4 from "./assets/SocksOnBots_lvl_4.json";
 import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
-import wear_sock_sprite_png from './assets/cutscene/cutscene-first-sock.png';
-import wear_sock_sprite_json from './assets/cutscene/cutscene-first-sock.json';
+
 import {code, playGame} from "./index";
 
 class GameScene_Level_4 extends Scene {
@@ -63,8 +62,7 @@ class GameScene_Level_4 extends Scene {
         this.load.spritesheet('bot', bot_sock, {frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('bot_with_sock', bot_with_sock, {frameWidth: 64, frameHeight: 64});
         this.load.tilemapTiledJSON('map', level_4);
-        this.load.path = './assets/cutscene/';
-        this.load.aseprite('cutscene-first-sock', wear_sock_sprite_png, wear_sock_sprite_json);
+
     }
 
     create() {
@@ -109,13 +107,7 @@ class GameScene_Level_4 extends Scene {
         this.createSock();
         this.createButtons();
 
-        this.tags = this.anims.createFromAseprite('cutscene-first-sock');
-        console.log(this.tags);
 
-
-        this.sprite = this.add.sprite(500, 300, 'cutscene-first-sock').setScale(3);
-
-        this.sprite.play({key: 'wear_sock'});
 
         this.scoreText = this.add.text(192, 256, 'Level Completed', {fontSize: '64px', fill: '#fff'});
         this.scoreText.setVisible(false);
@@ -191,7 +183,7 @@ class GameScene_Level_4 extends Scene {
     }
 
     createPlayer() {
-        this.player = this.physics.add.sprite(150, 150, 'bot').setScale(1.2);
+        this.player = this.physics.add.sprite(150, 150, 'bot').setScale(1.4);
         console.log(this.player);
         if (this.level === 4) {
             this.player.setX(160).setY(80);
@@ -199,7 +191,7 @@ class GameScene_Level_4 extends Scene {
         ;
         // this.player.body.bounce.set(1);
         this.player.body.setMaxSpeed(160);
-        this.player.setCircle(14, 2, 24);
+        this.player.setCircle(20, 12, 28);
         this.physics.add.collider(this.player, this.platforms, function (_player, _platform) {
             this.objectCollidedWith = _platform;
             this.collided = true;
@@ -347,7 +339,7 @@ class GameScene_Level_4 extends Scene {
         this.button.setInteractive();
         this.buttonUp.setInteractive().setVisible(false);
         this.buttonScan.setInteractive().setVisible(false);
-        this.button.on('pointerover', () => this.button.setStyle({fill: '#006db2'})).on('pointerout', () => this.button.setStyle({fill: '#fff'})).on('pointerdown', () => this.scene.start('preload'));
+        this.button.on('pointerover', () => this.button.setStyle({fill: '#006db2'})).on('pointerout', () => this.button.setStyle({fill: '#fff'})).on('pointerdown', () => this.scene.start('PreloadScene'));
         this.buttonScan.on('pointerdown', () => {
             if (this.scannedObject) {
                 console.log(this.blockingObjects);
@@ -395,29 +387,15 @@ class GameScene_Level_4 extends Scene {
 
     collectStar(player, star) {
         star.disableBody(true, true);
-
-
-        this.direction = 'DOWN';
-        this.player.setTexture('bot_with_sock');
-
+        this.cameras.main.fadeOut(3000, 0, 0, 0);
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+            this.time.delayedCall(2000, () => {
+                this.scene.start('CutSceneFirstSock');
+            });
+        });
         this.itemCollected = true;
         this.physics.pause();
         this.scoreText.setVisible(true);
-        // this.gameOver = true;
-
-        // if (stars.countActive(true) === 0) {
-        //     stars.children.iterate(function (child) {
-        //         child.enableBody(true, child.x, 200, true, true);
-        //     });
-        //
-        //     var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        // var bomb = bombs.create(x, 16, 'bomb');
-        // bomb.setBounce(1);
-        // bomb.setCollideWorldBounds(true);
-        // bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        // }
-
     }
 
     checkForWin() {
@@ -427,8 +405,6 @@ class GameScene_Level_4 extends Scene {
     }
 
     update() {
-        if (this.checkForWin()) this.player.setTexture('bot_with_sock');
-
 
         var tile = this.wallLayer.getTileAtWorldXY(this.player.x, this.player.y, true);
         console.log(this.player.x + '  ' + this.player.y);

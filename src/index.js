@@ -44,23 +44,23 @@ let code;
         console.log(blockList);
     }
 
-    function save(button) {
-        // Add code for saving the behavior of a button.
-        button.blocklySave = Blockly.serialization.workspaces.save(Blockly.common.getMainWorkspace());
-    }
+    // function save(button) {
+    //     // Add code for saving the behavior of a button.
+    //     button.blocklySave = Blockly.serialization.workspaces.save(Blockly.common.getMainWorkspace());
+    // }
 
-    function handleSave() {
-        document.body.setAttribute('mode', 'edit');
-        save(currentButton);
-    }
+    // function handleSave() {
+    //     document.body.setAttribute('mode', 'edit');
+    //     save(currentButton);
+    // }
 
-    function enableEditMode() {
-        document.body.setAttribute('mode', 'edit');
-        document.querySelectorAll('.button').forEach(btn => {
-            btn.removeEventListener('click', handlePlay);
-            btn.addEventListener('click', enableBlocklyMode);
-        });
-    }
+    // function enableEditMode() {
+    //     document.body.setAttribute('mode', 'edit');
+    //     document.querySelectorAll('.button').forEach(btn => {
+    //         btn.removeEventListener('click', handlePlay);
+    //         btn.addEventListener('click', enableBlocklyMode);
+    //     });
+    // }
 
     function enableMakerMode() {
         document.body.setAttribute('mode', 'maker');
@@ -83,9 +83,9 @@ let code;
         }
     }
 
-    document.querySelector('#edit').addEventListener('click', enableEditMode);
-    document.querySelector('#done').addEventListener('click', enableMakerMode);
-    document.querySelector('#save').addEventListener('click', handleSave);
+    // document.querySelector('#edit').addEventListener('click', enableEditMode);
+    // document.querySelector('#done').addEventListener('click', enableMakerMode);
+    // document.querySelector('#save').addEventListener('click', handleSave);
 
     enableMakerMode();
 

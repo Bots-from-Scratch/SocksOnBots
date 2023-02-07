@@ -4,6 +4,7 @@ import GameScene_Level_2 from "./GameScene_Level_2";
 import GameScene_Level_3 from "./GameScene_Level_3";
 import PreloadScene from "./PreloadScene";
 import GameScene_Level_4 from "./GameScene_Level_4";
+import CutSceneFirstSock from "./CutSceneFirstSock";
 
 const config = {
     type: Phaser.AUTO,
@@ -18,10 +19,10 @@ const config = {
         }
     },
     pixelArt: true,
-    // scene: [GameScene_Level_1, PreloadScene, GameScene_Level_4, GameScene_Level_3, GameScene_Level_2 ],
-    // scene: [GameScene_Level_2, PreloadScene, GameScene_Level_4, GameScene_Level_3, GameScene_Level_1 ],
-    // scene: [GameScene_Level_3, PreloadScene, GameScene_Level_4, GameScene_Level_1, GameScene_Level_2 ],
-    scene: [GameScene_Level_4, PreloadScene, GameScene_Level_1, GameScene_Level_3, GameScene_Level_2 ],
+    // scene: [GameScene_Level_1, PreloadScene, GameScene_Level_4, GameScene_Level_3, GameScene_Level_2, CutSceneFirstSock ],
+    // scene: [GameScene_Level_2, PreloadScene, GameScene_Level_4, GameScene_Level_3, GameScene_Level_1, CutSceneFirstSock ],
+    scene: [GameScene_Level_4, PreloadScene, GameScene_Level_1, GameScene_Level_3, GameScene_Level_2, CutSceneFirstSock ],
+    // scene: [CutSceneFirstSock, GameScene_Level_4, PreloadScene, GameScene_Level_1, GameScene_Level_3, GameScene_Level_2  ],
 };
 
 export {config}

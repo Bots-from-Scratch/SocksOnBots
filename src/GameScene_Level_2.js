@@ -63,16 +63,15 @@ class GameScene_Level_2 extends Scene {
 
     create() {
         // this.add.image(400, 300, 'sky');
-        const map = this.make.tilemap({key: 'map'});
+        this.map = this.make.tilemap({key: 'map'});
 
+        this.tileset = this.map.addTilesetImage('CosmicLilac_Tiles_64x64-cd3', 'tileset');
+        this.backgroundLayer = this.map.createLayer('background', this.tileset, 0, 0);
+        this.groundLayer = this.map.createLayer('floor', this.tileset, 0, 0);
+        this.wallLayer = this.map.createLayer('walls', this.tileset, 0, 0);
+        this.objectLayer = this.map.createLayer('objects', this.tileset, 0, 0);
 
-        const tileset = map.addTilesetImage('CosmicLilac_Tiles_64x64-cd3', 'tileset');
-        const backgroundLayer = map.createLayer('background', tileset, 0, 0);
-        const groundLayer = map.createLayer('floor', tileset, 0, 0);
-        const wallLayer = map.createLayer('walls', tileset, 0, 0);
-        const objectLayer = map.createLayer('objects', tileset, 0, 0);
-
-        wallLayer.setCollisionByProperty({collision: true});
+        this.wallLayer.setCollisionByProperty({collision: true});
         // wallLayer.setCollisionFromCollisionGroup(true, true);
         // wallLayer.renderDebug(this.add.graphics());
 
@@ -84,7 +83,7 @@ class GameScene_Level_2 extends Scene {
 
         // for (const el of gidMapEntries) console.log(el[1]);
 
-        map.setBaseTileSize(64, 64);
+        this.map.setBaseTileSize(64, 64);
 
 
         // const debugGraphics = this.add.graphics().setAlpha(0.5);
@@ -102,7 +101,7 @@ class GameScene_Level_2 extends Scene {
         this.scoreText = this.add.text(192, 256, 'Level Completed', {fontSize: '64px', fill: '#fff'});
         this.scoreText.setVisible(false);
 
-        this.physics.add.collider(this.player, wallLayer, () =>  this.upIsClear = false);
+        this.physics.add.collider(this.player, this.wallLayer, () =>  this.upIsClear = false);
 
 
         this.statusText = this.add.text(16, 50, 'Speed: ' + this.player.velocity + 'Angle: ' + this.player.body.rotation, {
@@ -112,13 +111,6 @@ class GameScene_Level_2 extends Scene {
         this.statusText.setVisible(false);
 
         this.gfx = this.add.graphics();
-        // this.bombs = this.physics.add.group();
-
-        // this.physics.add.collider(this.bombs, this.platforms);
-        // this.physics.add.collider(this.player, this.bombs);
-
-
-        // this.physics.add.collider(stars, platforms);
 
 
         this.physics.world.on('worldbounds', (body) => {
@@ -173,14 +165,14 @@ class GameScene_Level_2 extends Scene {
     }
 
     createPlayer() {
-        this.player = this.physics.add.sprite(150, 150, 'bot').setScale(1);
+        this.player = this.physics.add.sprite(150, 150, 'bot').setScale(1.4);
         if (this.level === 2) {
             this.player.setX(480).setY(520);
         }
         ;
         // this.player.body.bounce.set(1);
         this.player.body.setMaxSpeed(160);
-        this.player.setCircle(14, 2, 24);
+        this.player.setCircle(20, 12, 28);
         this.physics.add.collider(this.player, this.platforms, function (_player, _platform) {
             this.objectCollidedWith = _platform;
             this.collided = true;
@@ -327,7 +319,7 @@ class GameScene_Level_2 extends Scene {
         this.button.setInteractive();
         this.buttonUp.setInteractive().setVisible(false);
         this.buttonScan.setInteractive().setVisible(false);
-        this.button.on('pointerover', () => this.button.setStyle({fill: '#006db2'})).on('pointerout', () => this.button.setStyle({fill: '#fff'})).on('pointerdown', () => this.scene.start('preload'));
+        this.button.on('pointerover', () => this.button.setStyle({fill: '#006db2'})).on('pointerout', () => this.button.setStyle({fill: '#fff'})).on('pointerdown', () => this.scene.start('PreloadScene'));
         this.buttonScan.on('pointerdown', () => {
             if (this.scannedObject) {
                 console.log(this.blockingObjects);
@@ -397,7 +389,8 @@ class GameScene_Level_2 extends Scene {
     }
 
     checkForWin() {
-        if (this.player.x >= 940 && this.player.x <= 964 && this.player.y === 328) {
+        if (this.player.x >= 930 && this.player.x <= 964 && this.player.y === 325.6) {
+            this.cameras.main.fadeOut(1000, 0, 0, 0);
             this.physics.pause();
             this.scoreText.setVisible(true);
         }
