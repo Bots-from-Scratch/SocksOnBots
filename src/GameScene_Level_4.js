@@ -3,11 +3,14 @@ import platform from "./assets/platform.png";
 import star from "./assets/socke.png";
 import bomb from "./assets/bomb.png";
 import bot_sock from "./assets/Spritesheetohnesocke.png"
-import level_2 from "./assets/SocksOnBots_lvl_2.json";
+import bot_with_sock from "./assets/Spritesheet.png"
+import level_4 from "./assets/SocksOnBots_lvl_4.json";
 import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
+import wear_sock_sprite_png from './assets/cutscene/cutscene-first-sock.png';
+import wear_sock_sprite_json from './assets/cutscene/cutscene-first-sock.json';
 import {code, playGame} from "./index";
 
-class GameScene_Level_2 extends Scene {
+class GameScene_Level_4 extends Scene {
     ROTATION_RIGHT = 0;
     ROTATION_LEFT = 180;
     ROTATION_UP = -90;
@@ -16,13 +19,12 @@ class GameScene_Level_2 extends Scene {
 
 
     constructor() {
-        super('GameScene_Level_2');
-
+        super('GameScene_Level_4');
     }
 
     init() {
-
-        this.level = 2;
+        this.direction = '';
+        this.level = 4;
 
         this.score = 0;
 
@@ -49,6 +51,7 @@ class GameScene_Level_2 extends Scene {
         this.objectToScanFor = undefined;
         this.objectSighted = false;
         this.scanAngle = 0;
+        this.itemCollected = false;
     }
 
     preload() {
@@ -58,37 +61,44 @@ class GameScene_Level_2 extends Scene {
         this.load.image('star', star);
         this.load.image('bomb', bomb);
         this.load.spritesheet('bot', bot_sock, {frameWidth: 64, frameHeight: 64});
-        this.load.tilemapTiledJSON('map', level_2);
+        this.load.spritesheet('bot_with_sock', bot_with_sock, {frameWidth: 64, frameHeight: 64});
+        this.load.tilemapTiledJSON('map', level_4);
+        this.load.path = './assets/cutscene/';
+        this.load.aseprite('cutscene-first-sock', wear_sock_sprite_png, wear_sock_sprite_json);
     }
 
     create() {
         // this.add.image(400, 300, 'sky');
-        const map = this.make.tilemap({key: 'map'});
 
 
-        const tileset = map.addTilesetImage('CosmicLilac_Tiles_64x64-cd3', 'tileset');
-        const backgroundLayer = map.createLayer('background', tileset, 0, 0);
-        const groundLayer = map.createLayer('floor', tileset, 0, 0);
-        const wallLayer = map.createLayer('walls', tileset, 0, 0);
-        const objectLayer = map.createLayer('objects', tileset, 0, 0);
 
-        wallLayer.setCollisionByProperty({collision: true});
-        // wallLayer.setCollisionFromCollisionGroup(true, true);
-        // wallLayer.renderDebug(this.add.graphics());
+        this.map = this.make.tilemap({key: 'map'});
+
+
+        const tileset = this.map.addTilesetImage('CosmicLilac_Tiles_64x64-cd3', 'tileset');
+        const backgroundLayer = this.map.createLayer('background', tileset, 0, 0);
+        const groundLayer = this.map.createLayer('floor', tileset, 0, 0);
+        this.wallLayer = this.map.createLayer('walls', tileset, 0, 0);
+        const objectLayer = this.map.createLayer('objects', tileset, 0, 0);
+
+
+        this.wallLayer.setCollisionByProperty({collision: true});
+        // this.wallLayer.setCollisionFromCollisionGroup(true, true);
+        // this.wallLayer.renderDebug(this.add.graphics());
 
         // for (let i = 0 ; i<105; i++) console.log(tileset.getTileCollisionGroup(i));
 
         const collisionRect = new Phaser.Geom.Rectangle();
 
-        // let gidMapEntries = wallLayer.tileset[0].getTileData(0);
+        // let gidMapEntries = this.wallLayer.tileset[0].getTileData(0);
 
         // for (const el of gidMapEntries) console.log(el[1]);
 
-        map.setBaseTileSize(64, 64);
+        this.map.setBaseTileSize(64, 64);
 
 
         // const debugGraphics = this.add.graphics().setAlpha(0.5);
-        // wallLayer.renderDebug(debugGraphics, {
+        // this.wallLayer.renderDebug(debugGraphics, {
         //     tileColor: null,
         //     collidingTileColor: new Phaser.Display.Color(255, 255, 50, 255)
         // });
@@ -96,13 +106,21 @@ class GameScene_Level_2 extends Scene {
         this.createPlatforms();
         this.createPlayer();
         this.createCursor();
-        this.createStar();
+        this.createSock();
         this.createButtons();
+
+        this.tags = this.anims.createFromAseprite('cutscene-first-sock');
+        console.log(this.tags);
+
+
+        this.sprite = this.add.sprite(500, 300, 'cutscene-first-sock').setScale(3);
+
+        this.sprite.play({key: 'wear_sock'});
 
         this.scoreText = this.add.text(192, 256, 'Level Completed', {fontSize: '64px', fill: '#fff'});
         this.scoreText.setVisible(false);
 
-        this.physics.add.collider(this.player, wallLayer, () =>  this.upIsClear = false);
+        this.physics.add.collider(this.player, this.wallLayer);
 
 
         this.statusText = this.add.text(16, 50, 'Speed: ' + this.player.velocity + 'Angle: ' + this.player.body.rotation, {
@@ -160,10 +178,10 @@ class GameScene_Level_2 extends Scene {
         this.platforms = this.physics.add.staticGroup();
 
         // this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        // this.platforms.create(512, 128, 'ground').setScale(0.66, 8.1).setAlpha(0).refreshBody();
+        this.platforms.create(512, 128, 'ground').setScale(0.66, 8.1).setAlpha(0).refreshBody();
         //
         //
-        // this.platforms.create(864, 288, 'ground').setScale(0.5,6).setAlpha(0).refreshBody();
+        this.platforms.create(864, 288, 'ground').setScale(0.5, 6).setAlpha(0).refreshBody();
         // this.platforms.create(50, 250, 'ground');
         // this.platforms.create(750, 220, 'ground');
 
@@ -173,9 +191,10 @@ class GameScene_Level_2 extends Scene {
     }
 
     createPlayer() {
-        this.player = this.physics.add.sprite(150, 150, 'bot').setScale(1);
-        if (this.level === 2) {
-            this.player.setX(480).setY(520);
+        this.player = this.physics.add.sprite(150, 150, 'bot').setScale(1.2);
+        console.log(this.player);
+        if (this.level === 4) {
+            this.player.setX(160).setY(80);
         }
         ;
         // this.player.body.bounce.set(1);
@@ -305,6 +324,7 @@ class GameScene_Level_2 extends Scene {
             repeat: 0
         });
 
+
     }
 
 
@@ -312,10 +332,10 @@ class GameScene_Level_2 extends Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
     }
 
-    createStar() {
-        this.blueStar = this.physics.add.sprite(800, 100, 'star');
+    createSock() {
+        this.blueStar = this.physics.add.sprite(750, 120, 'star');
         // this.blueStar.setTint(0x006db2);
-        this.blueStar.setScale(0.4).setVisible(false);
+        this.blueStar.setScale(0.4);
 
         this.physics.add.overlap(this.player, this.blueStar, this.collectStar, null, this);
     }
@@ -376,10 +396,14 @@ class GameScene_Level_2 extends Scene {
     collectStar(player, star) {
         star.disableBody(true, true);
 
-        this.score += 10;
+
+        this.direction = 'DOWN';
+        this.player.setTexture('bot_with_sock');
+
+        this.itemCollected = true;
         this.physics.pause();
-        this.scoreText.setText('Level Completed');
-        this.gameOver = true;
+        this.scoreText.setVisible(true);
+        // this.gameOver = true;
 
         // if (stars.countActive(true) === 0) {
         //     stars.children.iterate(function (child) {
@@ -397,15 +421,21 @@ class GameScene_Level_2 extends Scene {
     }
 
     checkForWin() {
-        if (this.player.x >= 940 && this.player.x <= 964 && this.player.y === 328) {
-            this.physics.pause();
-            this.scoreText.setVisible(true);
+        if (this.itemCollected) {
+            return true;
         }
     }
 
     update() {
-        this.checkForWin();
+        if (this.checkForWin()) this.player.setTexture('bot_with_sock');
+
+
+        var tile = this.wallLayer.getTileAtWorldXY(this.player.x, this.player.y, true);
         console.log(this.player.x + '  ' + this.player.y);
+        if (tile && tile.properties.slowingDown) {
+            // slow down the player
+            this.player.setVelocity(this.player.body.velocity.x * 0.5, this.player.body.velocity.y * 0.5);
+        }
 
         if (!this.scannedObject) {
             this.scanLineGfx.setVisible(false);
@@ -521,7 +551,7 @@ class GameScene_Level_2 extends Scene {
 
 
         } else if (this.cursors.right.isDown || this.direction === 'RIGHT') {
-            if (this. rotation !== this.ROTATION_RIGHT) {
+            if (this.rotation !== this.ROTATION_RIGHT) {
                 if (this.rotation === this.ROTATION_LEFT) {
                     this.player.anims.play('leftToRight');
                 } else if (this.rotation === this.ROTATION_UP) {
@@ -541,7 +571,7 @@ class GameScene_Level_2 extends Scene {
 
         if (this.cursors.up.isDown || this.direction === 'UP') {
 
-            if (this. rotation !== this.ROTATION_UP) {
+            if (this.rotation !== this.ROTATION_UP) {
                 if (this.rotation === this.ROTATION_LEFT) {
                     this.player.anims.play('leftToUp');
                 } else if (this.rotation === this.ROTATION_RIGHT) {
@@ -557,7 +587,7 @@ class GameScene_Level_2 extends Scene {
 
         } else if (this.cursors.down.isDown || this.direction === 'DOWN') {
 
-            if (this. rotation !== this.ROTATION_DOWN) {
+            if (this.rotation !== this.ROTATION_DOWN) {
                 if (this.rotation === this.ROTATION_LEFT) {
                     this.player.anims.play('leftToDown');
                 } else if (this.rotation === this.ROTATION_RIGHT) {
@@ -581,4 +611,4 @@ class GameScene_Level_2 extends Scene {
     }
 }
 
-export default GameScene_Level_2
+export default GameScene_Level_4

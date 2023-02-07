@@ -2,8 +2,8 @@ import {Scene} from 'phaser';
 import platform from "./assets/platform.png";
 import star from "./assets/socke.png";
 import bomb from "./assets/bomb.png";
-import bot_sock from "./assets/Spritesheet.png"
-import level_1 from "./assets/SocksOnBots_lvl_1.json";
+import bot_sock from "./assets/Spritesheetohnesocke.png"
+import mapLevel1 from "./assets/SocksOnBots_lvl_1.json";
 import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
 import {code, playGame} from "./index";
 
@@ -16,7 +16,7 @@ class GameScene_Level_1 extends Scene {
 
 
     constructor() {
-        super('game');
+        super('GameScene_Level_1');
 
     }
 
@@ -58,36 +58,36 @@ class GameScene_Level_1 extends Scene {
         this.load.image('star', star);
         this.load.image('bomb', bomb);
         this.load.spritesheet('bot', bot_sock, {frameWidth: 64, frameHeight: 64});
-        this.load.tilemapTiledJSON('map', level_1);
+        this.load.tilemapTiledJSON('map', mapLevel1);
     }
 
     create() {
         // this.add.image(400, 300, 'sky');
-        const map = this.make.tilemap({key: 'map'});
+        this.map = this.make.tilemap({key: 'map'});
 
 
-        const tileset = map.addTilesetImage('CosmicLilac_Tiles_64x64-cd3', 'tileset');
-        const backgroundLayer = map.createLayer('background', tileset, 0, 0);
-        const groundLayer = map.createLayer('floor', tileset, 0, 0);
-        const wallLayer = map.createLayer('walls', tileset, 0, 0);
+        this.tileset = this.map.addTilesetImage('CosmicLilac_Tiles_64x64-cd3', 'tileset');
+        const backgroundLayer = this.map.createLayer('background', this.tileset, 0, 0);
+        const groundLayer = this.map.createLayer('floor', this.tileset, 0, 0);
+        this.wallLayer = this.map.createLayer('walls', this.tileset, 0, 0);
 
-        wallLayer.setCollisionByProperty({collision: true});
-        // wallLayer.setCollisionFromCollisionGroup(true, true);
-        // wallLayer.renderDebug(this.add.graphics());
+        this.wallLayer.setCollisionByProperty({collision: true});
+        // this.wallLayer.setCollisionFromCollisionGroup(true, true);
+        // this.wallLayer.renderDebug(this.add.graphics());
 
         // for (let i = 0 ; i<105; i++) console.log(tileset.getTileCollisionGroup(i));
 
         const collisionRect = new Phaser.Geom.Rectangle();
 
-        // let gidMapEntries = wallLayer.tileset[0].getTileData(0);
+        // let gidMapEntries = this.wallLayer.tileset[0].getTileData(0);
 
         // for (const el of gidMapEntries) console.log(el[1]);
 
-        map.setBaseTileSize(64, 64);
+        this.map.setBaseTileSize(64, 64);
 
 
         // const debugGraphics = this.add.graphics().setAlpha(0.5);
-        // wallLayer.renderDebug(debugGraphics, {
+        // this.wallLayer.renderDebug(debugGraphics, {
         //     tileColor: null,
         //     collidingTileColor: new Phaser.Display.Color(255, 255, 50, 255)
         // });
@@ -98,10 +98,10 @@ class GameScene_Level_1 extends Scene {
         this.createStar();
         this.createButtons();
 
-        this.scoreText = this.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#fff'});
+        this.scoreText = this.add.text(192, 256, 'Level Completed', {fontSize: '64px', fill: '#fff'});
         this.scoreText.setVisible(false);
 
-        this.physics.add.collider(this.player, wallLayer);
+        this.physics.add.collider(this.player, this.wallLayer);
 
 
         this.statusText = this.add.text(16, 50, 'Speed: ' + this.player.velocity + 'Angle: ' + this.player.body.rotation, {
@@ -173,7 +173,7 @@ class GameScene_Level_1 extends Scene {
 
     createPlayer() {
         this.player = this.physics.add.sprite(150, 150, 'bot').setScale(1);
-        if (this.level = 1) {
+        if (this.level === 1) {
             this.player.setX(480).setY(600);
         }
         ;
@@ -305,13 +305,6 @@ class GameScene_Level_1 extends Scene {
         });
 
 
-
-
-
-
-
-
-
     }
 
 
@@ -322,14 +315,14 @@ class GameScene_Level_1 extends Scene {
     createStar() {
         this.blueStar = this.physics.add.sprite(800, 100, 'star');
         // this.blueStar.setTint(0x006db2);
-        this.blueStar.setScale(0.4);
+        this.blueStar.setScale(0.4).setVisible(false);
 
         this.physics.add.overlap(this.player, this.blueStar, this.collectStar, null, this);
     }
 
     createButtons() {
         this.button = this.add.text(40, 600, 'Back to Menu');
-        this.buttonUp = this.add.text(600, 400, 'Increase Score');
+        this.buttonUp = this.add.text(600, 400, 'To next level');
         this.buttonScan = this.add.text(600, 450, 'Scan For Star');
         this.button.setInteractive();
         this.buttonUp.setInteractive().setVisible(false);
@@ -347,11 +340,9 @@ class GameScene_Level_1 extends Scene {
             }
         });
 
-        this.buttonUp.on('pointerdown', () => {
-            this.score += 10;
-            this.scoreText.setText('Score: ' + this.score);
-            console.log(this.player);
-        });
+        this.buttonUp.on('pointerdown',
+            () => this.scene.start('GameScene_Level_2')
+        );
     }
 
     checkIfObjectBlocksViewline(gameObject) {
@@ -403,7 +394,22 @@ class GameScene_Level_1 extends Scene {
 
     }
 
+    checkForWin() {
+        if (this.player.x >= 470 && this.player.x <= 490 && this.player.y === 8) {
+            this.physics.pause();
+            this.scoreText.setVisible(true);
+        }
+    }
+
     update() {
+        this.checkForWin();
+        console.log(this.player.x + '  ' + this.player.y);
+
+        var tile = this.wallLayer.getTileAtWorldXY(this.player.x, this.player.y, true);
+        if (tile && tile.properties.slowingDown) {
+            // slow down the player
+            this.player.setVelocity(this.player.body.velocity.x * 0.5, this.player.body.velocity.y * 0.5);
+        }
 
         if (!this.scannedObject) {
             this.scanLineGfx.setVisible(false);
@@ -519,7 +525,7 @@ class GameScene_Level_1 extends Scene {
 
 
         } else if (this.cursors.right.isDown || this.direction === 'RIGHT') {
-            if (this. rotation !== this.ROTATION_RIGHT) {
+            if (this.rotation !== this.ROTATION_RIGHT) {
                 if (this.rotation === this.ROTATION_LEFT) {
                     this.player.anims.play('leftToRight');
                 } else if (this.rotation === this.ROTATION_UP) {
@@ -539,7 +545,7 @@ class GameScene_Level_1 extends Scene {
 
         if (this.cursors.up.isDown || this.direction === 'UP') {
 
-            if (this. rotation !== this.ROTATION_UP) {
+            if (this.rotation !== this.ROTATION_UP) {
                 if (this.rotation === this.ROTATION_LEFT) {
                     this.player.anims.play('leftToUp');
                 } else if (this.rotation === this.ROTATION_RIGHT) {
@@ -555,7 +561,7 @@ class GameScene_Level_1 extends Scene {
 
         } else if (this.cursors.down.isDown || this.direction === 'DOWN') {
 
-            if (this. rotation !== this.ROTATION_DOWN) {
+            if (this.rotation !== this.ROTATION_DOWN) {
                 if (this.rotation === this.ROTATION_LEFT) {
                     this.player.anims.play('leftToDown');
                 } else if (this.rotation === this.ROTATION_RIGHT) {
