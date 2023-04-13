@@ -44,10 +44,25 @@ Blockly.JavaScript['move_player'] = function (block, el) {
     let code;
 
 
-        code = 'if("' + blockValue + '" !== this.direction) { if("'+ blockValue +'" === "TO_OBJECT" && !this.objectSighted){this.direction = "";} else {this.direction = "' + blockValue + '"; }};\n if (this.direction === \'STOP\') {console.log("Stop")};';
+    code = 'move_player(); \n ';
 
 
     return code;
 };
 
+function initInterpreterGoRight(interpreter, scope) {
+    // Ensure function name does not conflict with variable names.
+
+    // uses to time outs, terminates the upward motion before termination moving right
+    Blockly.JavaScript.addReservedWords('move_player');
+    var wrapper = interpreter.createAsyncFunction(
+        function (callback) {
+            this.direction = 'RIGHT';
+            setTimeout(function () {
+                this.direction = "UP";
+                callback();
+            }, 300);
+        });
+    interpreter.setProperty(scope, 'move_player', wrapper);
+}
 

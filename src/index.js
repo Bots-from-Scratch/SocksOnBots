@@ -7,9 +7,12 @@ import './blockly/blocks/direction_clear';
 import './blockly/blocks/object_sock';
 import './blockly/blocks/scan_for_object';
 import './blockly/blocks/bool_sighted';
+// import './acorn_interpreter'
+// import {Interpreter} from './acorn_interpreter'
 import {JavaScript} from "blockly";
 import GameScene_Level_1 from "./GameScene_Level_1";
 import {config} from "./config";
+import {javascriptGenerator} from "blockly/javascript";
 
 
 var playGame = false;
@@ -19,29 +22,53 @@ let blockListTmp;
 let code;
 
 
+
+
 (function () {
 
     let currentButton;
+    let myInterpreter = null;
+    function initApi(interpreter, scope) {
+        // Add an API function for the alert() block, generated for "text_print" blocks.
+        initInterpreterGoRight(interpreter, scope);
+
+        // Add an API function for highlighting blocks.
+        var wrapper = function (id) {
+            id = id ? id.toString() : '';
+            return interpreter.createPrimitive(highlightBlock(id));
+        };
+        interpreter.setProperty(scope, 'highlightBlock',
+            interpreter.createNativeFunction(wrapper));
+    }
 
     function handlePlay(event) {
+
+        code = javascriptGenerator.workspaceToCode(Blockly.common.getMainWorkspace());
+        console.log("code");
+        console.log(code)
+        myInterpreter = new Interpreter(code, initApi);
+        console.log("myInterpreter");
+        console.log(myInterpreter)
+        myInterpreter.run();
+
         // Add code for playing sound.
-        blockList = [];
-        Blockly.JavaScript.init(Blockly.common.getMainWorkspace());
-        loadWorkspace(event.target);
-        code = Blockly.JavaScript.workspaceToCode(Blockly.common.getMainWorkspace());
+        // blockList = [];
+        // Blockly.JavaScript.init(Blockly.common.getMainWorkspace());
+        // loadWorkspace(event.target);
+        // code = Blockly.JavaScript.workspaceToCode(Blockly.common.getMainWorkspace());
         console.log("code");
         console.log(code);
         playGame = true;
-        blockListTmp = Blockly.common.getMainWorkspace().getAllBlocks(true);
-        console.log("blockListTmp");
-        console.log(blockListTmp);
+        // blockListTmp = Blockly.common.getMainWorkspace().getAllBlocks(true);
+        // console.log("blockListTmp");
+        // console.log(blockListTmp);
 
         // blockListTmp.forEach(function (block) {
         //     blockList.push(Blockly.JavaScript.blockToCode(block));
         //
         // });
-        console.log("blockList");
-        console.log(blockList);
+        // console.log("blockList");
+        // console.log(blockList);
     }
 
     // function save(button) {
@@ -132,20 +159,20 @@ let code;
     };
 
     Blockly.inject('blocklyDiv', {
-        toolbox : toolbox,
-        collapse : true,
-        comments : true,
-        disable : true,
-        maxBlocks : Infinity,
-        trashcan : true,
-        horizontalLayout : false,
-        toolboxPosition : 'start',
-        css : true,
-        media : 'https://blockly-demo.appspot.com/static/media/',
-        rtl : false,
-        scrollbars : true,
-        sounds : true,
-        oneBasedIndex : true
+        toolbox: toolbox,
+        collapse: true,
+        comments: true,
+        disable: true,
+        maxBlocks: Infinity,
+        trashcan: true,
+        horizontalLayout: false,
+        toolboxPosition: 'start',
+        css: true,
+        media: 'https://blockly-demo.appspot.com/static/media/',
+        rtl: false,
+        scrollbars: true,
+        sounds: true,
+        oneBasedIndex: true
     });
 
 })();

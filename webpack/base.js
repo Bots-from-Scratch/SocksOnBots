@@ -29,6 +29,11 @@ module.exports = {
             },
         ]
     },
+    resolve: {
+        fallback:{
+            "vm": require.resolve("vm-browserify")
+        }
+    },
     plugins: [
         new CleanWebpackPlugin({
             root: path.resolve(__dirname, "../")

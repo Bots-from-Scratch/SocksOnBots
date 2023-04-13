@@ -38,7 +38,8 @@
   "dependencies": {
     "blockly": "^9.0.1",
     "browserify-fs": "^1.0.0",
-    "phaser": "^3.55.2"
+    "phaser": "^3.55.2",
+    "vm-browserify": "^1.1.2"
   },
   "browser": {
     "fs": false,
