@@ -10,12 +10,13 @@ import './blockly/blocks/bool_sighted';
 import {JavaScript} from "blockly";
 import GameScene_Level_1 from "./GameScene_Level_1";
 import {config} from "./config";
+import GameScene_Level_4 from "./GameScene_Level_4";
 
 
 var playGame = false;
 var blockList = [];
 
-let blockListTmp;
+let blockListTmp = [];
 let code;
 
 
@@ -29,19 +30,20 @@ let code;
         Blockly.JavaScript.init(Blockly.common.getMainWorkspace());
         loadWorkspace(event.target);
         code = Blockly.JavaScript.workspaceToCode(Blockly.common.getMainWorkspace());
-        console.log("code");
-        console.log(code);
+        // console.log("code");
+        // console.log(code);
         playGame = true;
         blockListTmp = Blockly.common.getMainWorkspace().getAllBlocks(true);
-        console.log("blockListTmp");
-        console.log(blockListTmp);
+        // console.log("blockListTmp");
+        // console.log(blockListTmp);
 
-        // blockListTmp.forEach(function (block) {
-        //     blockList.push(Blockly.JavaScript.blockToCode(block));
-        //
-        // });
-        console.log("blockList");
-        console.log(blockList);
+        blockListTmp.forEach(function (block) {
+            blockList.push(Blockly.JavaScript.blockToCode(block, true));
+        });
+        GameScene_Level_4.runBlocks(blockList);
+
+        // console.log("blockList");
+        // console.log(blockList);
     }
 
     // function save(button) {
@@ -132,24 +134,24 @@ let code;
     };
 
     Blockly.inject('blocklyDiv', {
-        toolbox : toolbox,
-        collapse : true,
-        comments : true,
-        disable : true,
-        maxBlocks : Infinity,
-        trashcan : true,
-        horizontalLayout : false,
-        toolboxPosition : 'start',
-        css : true,
-        media : 'https://blockly-demo.appspot.com/static/media/',
-        rtl : false,
-        scrollbars : true,
-        sounds : true,
-        oneBasedIndex : true
+        toolbox: toolbox,
+        collapse: true,
+        comments: true,
+        disable: true,
+        maxBlocks: Infinity,
+        trashcan: true,
+        horizontalLayout: false,
+        toolboxPosition: 'start',
+        css: true,
+        media: 'https://blockly-demo.appspot.com/static/media/',
+        rtl: false,
+        scrollbars: true,
+        sounds: true,
+        oneBasedIndex: true
     });
 
 })();
 
 const game = new Phaser.Game(config);
 
-export {code, playGame}
+export {code, playGame, blockList}

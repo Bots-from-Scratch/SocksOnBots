@@ -38,16 +38,12 @@ Blockly.common.defineBlocksWithJsonArray([
     }
 ]);
 
-
 Blockly.JavaScript['move_player'] = function (block, el) {
     let blockValue = block.getFieldValue('VALUE');
     let code;
 
-
-        code = 'if("' + blockValue + '" !== this.direction) { if("'+ blockValue +'" === "TO_OBJECT" && !this.objectSighted){this.direction = "";} else {this.direction = "' + blockValue + '"; }};\n if (this.direction === \'STOP\') {console.log("Stop")};';
+    code = "yield '" + blockValue + "'";
 
 
     return code;
 };
-
-

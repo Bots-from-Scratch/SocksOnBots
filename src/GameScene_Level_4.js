@@ -7,7 +7,9 @@ import bot_with_sock from "./assets/Spritesheet.png"
 import level_4 from "./assets/SocksOnBots_lvl_4.json";
 import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
 
-import {code, playGame} from "./index";
+import {blockList, code, playGame} from "./index";
+
+let direction;
 
 class GameScene_Level_4 extends Scene {
     ROTATION_RIGHT = 0;
@@ -22,7 +24,7 @@ class GameScene_Level_4 extends Scene {
     }
 
     init() {
-        this.direction = '';
+        direction = '';
         this.level = 4;
 
         this.score = 0;
@@ -69,7 +71,6 @@ class GameScene_Level_4 extends Scene {
         // this.add.image(400, 300, 'sky');
 
 
-
         this.map = this.make.tilemap({key: 'map'});
 
 
@@ -106,7 +107,6 @@ class GameScene_Level_4 extends Scene {
         this.createCursor();
         this.createSock();
         this.createButtons();
-
 
 
         this.scoreText = this.add.text(192, 256, 'Level Completed', {fontSize: '64px', fill: '#fff'});
@@ -404,8 +404,24 @@ class GameScene_Level_4 extends Scene {
         }
     }
 
-    update() {
 
+    static runBlocks = (blockList) => {
+        const myFunction = eval(`(function* () {
+            ${blockList.join('')}
+        })`);
+        const gen = myFunction();
+        let lastBlock;
+        for (const block of gen) {
+            console.log("Next block: " + block);
+            // Hier kannst du die Ausgabe des Blocks verarbeiten, z.B. indem du ihn an ein Spiel-Objekt übergibst
+            lastBlock = block;
+        }
+        direction = lastBlock;
+        console.log(this.direction + playGame);
+    }
+
+
+    update() {
         var tile = this.wallLayer.getTileAtWorldXY(this.player.x, this.player.y, true);
         console.log(this.player.x + '  ' + this.player.y);
         if (tile && tile.properties.slowingDown) {
@@ -481,7 +497,15 @@ class GameScene_Level_4 extends Scene {
 
 
             if (playGame) {
-                eval(code);
+                let codeEval = code;
+                // console.log(codeEval);
+                // const blockCode = {
+                //     *generator() {
+                //         let codeEval = eval(code);
+                //         console.log()
+                //     }
+                // }
+                // eval(code);
                 this.physics.velocityFromAngle(this.rotation, this.player.body.maxSpeed, this.player.body.acceleration);
                 try {
 
@@ -516,7 +540,7 @@ class GameScene_Level_4 extends Scene {
         }
 
 
-        if (this.cursors.left.isDown || this.direction === 'LEFT') {
+        if (this.cursors.left.isDown || direction === 'LEFT') {
 
             if (this.rotation !== this.ROTATION_LEFT) {
                 this.player.anims.play('turnToSide', true);
@@ -526,7 +550,7 @@ class GameScene_Level_4 extends Scene {
             this.player.setVelocityY(0);
 
 
-        } else if (this.cursors.right.isDown || this.direction === 'RIGHT') {
+        } else if (this.cursors.right.isDown || direction === 'RIGHT') {
             if (this.rotation !== this.ROTATION_RIGHT) {
                 if (this.rotation === this.ROTATION_LEFT) {
                     this.player.anims.play('leftToRight');
@@ -585,6 +609,8 @@ class GameScene_Level_4 extends Scene {
             // player.setVelocityY(0);
         }
     }
+
+
 }
 
 export default GameScene_Level_4
