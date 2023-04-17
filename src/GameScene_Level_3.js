@@ -1,6 +1,6 @@
 import {Scene} from 'phaser';
 import platform from "./assets/platform.png";
-import star from "./assets/key.png";
+import star from "./assets/socke.png";
 import bomb from "./assets/bomb.png";
 import bot_sock from "./assets/Spritesheetohnesocke.png"
 import level_3 from "./assets/SocksOnBots_lvl_3.json";
