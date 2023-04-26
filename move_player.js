@@ -1,3 +1,6 @@
+
+import {direction} from "./src";
+
 Blockly.common.defineBlocksWithJsonArray([
     {
         "type": "move_player",

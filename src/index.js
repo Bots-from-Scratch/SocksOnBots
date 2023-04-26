@@ -21,7 +21,7 @@ import 'blockly/msg/en'
 
 var playGame = false;
 var blockList = [];
-var direction;
+var direction = '';
 let blockListTmp;
 let code;
 let myInterpreter = null;
