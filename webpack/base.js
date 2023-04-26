@@ -2,8 +2,10 @@ const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
+    target: "web",
     mode: "development",
     devtool: "eval-source-map",
     module: {
@@ -12,7 +14,7 @@ module.exports = {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: "babel-loader"
+                    loader: "babel-loader",
                 }
             },
             {
@@ -30,13 +32,21 @@ module.exports = {
         ]
     },
     resolve: {
-        fallback:{
+        fallback: {
             "vm": require.resolve("vm-browserify")
         }
     },
+
+    output: {
+        path: path.resolve(__dirname, "dist")
+    },
+    externals: {
+        acorn: 'acorn'
+    },
+    // context: path.join(__dirname, ''),
     plugins: [
         new CleanWebpackPlugin({
-            root: path.resolve(__dirname, "../")
+            cleanOnceBeforeBuildPatterns: [path.join(__dirname, "dist/**/*")],
         }),
         new webpack.DefinePlugin({
             CANVAS_RENDERER: JSON.stringify(true),
@@ -44,6 +54,16 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: "./index.html"
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: 'acorn_interpreter.js'
+                },
+                {
+                    from: 'move_player.js'
+                }
+            ]
         })
     ]
 };

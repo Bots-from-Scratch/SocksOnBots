@@ -17,10 +17,44 @@
   "bugs": {
     "url": "https://github.com/Bots-from-Scratch/Clean-It-Up-Game/issues"
   },
+  "blocklyDemoConfig": {
+    "title": "JS Interpreter",
+    "files": [
+      "index.html",
+      "async-execution.html",
+      "backwards.html",
+      "step-execution.html",
+      "src/blockly/acorn_interpreter.js",
+      "./src/blockly/acorn.js",
+      "./src/blockly/interpreter.js",
+      "./src/blockly/serialize.js",
+      "./src/blockly/diff_match_patch.js",
+      "./src/blockly/toolbox_phaser.js",
+      "./src/blockly/wait_block.js",
+      "./node_modules/blockly/*_compressed.js",
+      "./node_modules/blockly/*_compressed.js.map",
+      "./node_modules/blockly/msg/en.js",
+      "./node_modules/blockly/media/*"
+    ],
+    "pages": [
+      {
+        "label": "Step Execution",
+        "link": "step-execution.html"
+      },
+      {
+        "label": "Async Execution",
+        "link": "async-execution.html"
+      },
+      {
+        "label": "Backwards Execution",
+        "link": "backwards.html"
+      }
+    ]
+  },
   "devDependencies": {
     "@babel/core": "^7.7.2",
-    "@babel/preset-env": "^7.7.1",
-    "babel-loader": "^8.0.6",
+    "@babel/preset-env": "^7.21.4",
+    "babel-loader": "^9.1.2",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.7.2",
     "file-loader": "^6.2.0",
@@ -30,14 +64,16 @@
     "sass-loader": "^13.2.0",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.6",
-    "webpack": "^5.75.0",
+    "webpack": "^5.76.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.11.1",
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "blockly": "^9.0.1",
+    "acorn": "^8.8.2",
+    "blockly": "^9.2.1",
     "browserify-fs": "^1.0.0",
+    "copy-webpack-plugin": "^11.0.0",
     "phaser": "^3.55.2",
     "vm-browserify": "^1.1.2"
   },

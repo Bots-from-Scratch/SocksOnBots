@@ -7,7 +7,7 @@ import bot_with_sock from "./assets/Spritesheet.png"
 import level_4 from "./assets/SocksOnBots_lvl_4.json";
 import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
 
-import {code, playGame} from "./index";
+import {code, playGame, direction} from "./index";
 
 class GameScene_Level_4 extends Scene {
     ROTATION_RIGHT = 0;
@@ -405,9 +405,8 @@ class GameScene_Level_4 extends Scene {
     }
 
     update() {
-
         var tile = this.wallLayer.getTileAtWorldXY(this.player.x, this.player.y, true);
-        console.log(this.player.x + '  ' + this.player.y);
+        // console.log(this.player.x + '  ' + this.player.y);
         if (tile && tile.properties.slowingDown) {
             // slow down the player
             this.player.setVelocity(this.player.body.velocity.x * 0.5, this.player.body.velocity.y * 0.5);
