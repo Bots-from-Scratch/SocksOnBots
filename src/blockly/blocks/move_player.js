@@ -44,6 +44,6 @@ Blockly.JavaScript['move_player'] = function (block, el) {
 
     code = "yield '" + blockValue + "'";
 
-
+console.log("movePlayer")
     return code;
 };

@@ -8,23 +8,62 @@ import level_4 from "./assets/SocksOnBots_lvl_4.json";
 import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
 
 import {blockList, code, playGame} from "./index";
+import gameScene_Level_4 from "./GameScene_Level_4";
 
-let direction;
+let blockGenerator;
+let blockFunction;
+
+// let direction;
 
 class GameScene_Level_4 extends Scene {
+
     ROTATION_RIGHT = 0;
     ROTATION_LEFT = 180;
     ROTATION_UP = -90;
     ROTATION_DOWN = 90;
     SCAN_DISTANCE = 200;
 
-
     constructor() {
         super('GameScene_Level_4');
+
+        const dir = {
+            right: { isClear: true, isMoving: false },
+            left: { isClear: true, isMoving: false },
+            up: { isClear: true, isMoving: false },
+            down: { isClear: true, isMoving: false }
+        };
+
+    //     Object.keys(dir).forEach(key => {
+    //         Object.defineProperty(dir, key, {
+    //             get() {
+    //                 return this._dir[key];
+    //             },
+    //             set(value) {
+    //                 this._dir[key] = value;
+    //             }
+    //         });
+    //     });
+    //
+    //     this._dir = dir;
+    //
+    // }
+    //
+    // get dir() {
+    //     return this._dir;
+    // }
+    //
+    // set dir(value) {
+    //     this._dir = value;
     }
 
     init() {
-        direction = '';
+        this.dir = {
+            right: { isClear: true, isMoving: false },
+            left: { isClear: true, isMoving: false },
+            up: { isClear: true, isMoving: false },
+            down: { isClear: true, isMoving: false }
+        };
+        this.direction = '';
         this.level = 4;
 
         this.score = 0;
@@ -102,11 +141,16 @@ class GameScene_Level_4 extends Scene {
         //     collidingTileColor: new Phaser.Display.Color(255, 255, 50, 255)
         // });
 
+
+
         this.createPlatforms();
         this.createPlayer();
         this.createCursor();
         this.createSock();
         this.createButtons();
+
+
+
 
 
         this.scoreText = this.add.text(192, 256, 'Level Completed', {fontSize: '64px', fill: '#fff'});
@@ -119,7 +163,7 @@ class GameScene_Level_4 extends Scene {
             fontSize: '16px',
             fill: '#fff'
         });
-        this.statusText.setVisible(false);
+        this.statusText.setVisible(true);
 
         this.gfx = this.add.graphics();
         // this.bombs = this.physics.add.group();
@@ -166,6 +210,7 @@ class GameScene_Level_4 extends Scene {
 //------------------------------------------------------------------------------------------------------------
 //-------CREATE FUNCTIONS
 
+
     createPlatforms() {
         this.platforms = this.physics.add.staticGroup();
 
@@ -199,17 +244,21 @@ class GameScene_Level_4 extends Scene {
             if (!_player.body.blocked.none) {
 
                 if (_player.body.blocked.up) {
+                    console.log("frontBlocked");
                     // player.setY(player.y + 2);
-                    this.upIsClear = false;
+                    this.dir.up.isClear = false;
                 } else if (_player.body.blocked.down) {
                     // player.setY(player.y - 2);
-                    this.downIsClear = false;
+                    this.dir.down.isClear = false;
                 } else if (_player.body.blocked.right) {
                     // player.setX(player.x - 2);
-                    this.rightIsClear = false;
+                    console.log(this.dir.right.isClear)
+                    this.dir.right.isClear = false;
+                    console.log(this.dir.right.isClear)
+                    console.log("rightBlocked");
                 } else {
                     // player.setX(player.x + 2);
-                    this.leftIsClear = false;
+                    this.dir.left.isClear = false;
                 }
                 this.player.setVelocityX(0);
                 this.player.setVelocityY(0);
@@ -406,24 +455,40 @@ class GameScene_Level_4 extends Scene {
 
 
     static runBlocks = (blockList) => {
-        const myFunction = eval(`(function* () {
-            ${blockList.join('')}
+        console.log(blockList);
+        blockGenerator = eval(`(function* () {
+            ${blockList.join(';')}
         })`);
-        const gen = myFunction();
-        let lastBlock;
-        for (const block of gen) {
-            console.log("Next block: " + block);
-            // Hier kannst du die Ausgabe des Blocks verarbeiten, z.B. indem du ihn an ein Spiel-Objekt übergibst
-            lastBlock = block;
-        }
-        direction = lastBlock;
-        console.log(this.direction + playGame);
+        blockFunction = blockGenerator();
     }
 
 
     update() {
+        // console.log(this.direction);
+        // let lastBlock;
+        // for (const block of gen) {
+        //     console.log("Next block: " + block);
+        //     lastBlock = block;
+        // }
+        // direction = lastBlock;
+        // console.log(this.direction + playGame);
+        if (blockFunction !== undefined) {
+            console.log(this.dir.right.isClear)
+            var blockResult = blockFunction.next();
+            console.log("next")
+            if (blockResult.value !== undefined) {
+                console.log(blockResult.value);
+                this.direction = blockResult.value;
+            }
+            if (blockResult.done) {
+                //...
+                blockFunction = undefined;
+                this.direction = '';
+            }
+        }
+
         var tile = this.wallLayer.getTileAtWorldXY(this.player.x, this.player.y, true);
-        console.log(this.player.x + '  ' + this.player.y);
+        // console.log(this.player.x + '  ' + this.player.y);
         if (tile && tile.properties.slowingDown) {
             // slow down the player
             this.player.setVelocity(this.player.body.velocity.x * 0.5, this.player.body.velocity.y * 0.5);
@@ -470,7 +535,7 @@ class GameScene_Level_4 extends Scene {
                 if (distClosest > hypot) {
                     console.log("clear")
                     this.leftIsClear = true;
-                    this.rightIsClear = true;
+                    this.dir.right.isClear = true;
                     this.downIsClear = true;
                     this.upIsClear = true;
                     if (this.player.body.x - this.player.body.prev.x !== 0 && (this.rotation === 0 || this.rotation === 180)) {
@@ -493,7 +558,7 @@ class GameScene_Level_4 extends Scene {
 
 
             }
-            this.statusText.setText('  right clear: ' + this.rightIsClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
+            this.statusText.setText('  right clear: ' + this.dir.right.isClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
 
 
             if (playGame) {
@@ -506,7 +571,10 @@ class GameScene_Level_4 extends Scene {
                 //     }
                 // }
                 // eval(code);
-                this.physics.velocityFromAngle(this.rotation, this.player.body.maxSpeed, this.player.body.acceleration);
+                if (this.direction === '') {
+                    this.player.setVelocityX(0);
+                    this.player.setVelocityY(0);
+                }
                 try {
 
 
@@ -540,17 +608,17 @@ class GameScene_Level_4 extends Scene {
         }
 
 
-        if (this.cursors.left.isDown || direction === 'LEFT') {
+        if (this.cursors.left.isDown || this.direction === 'LEFT') {
 
             if (this.rotation !== this.ROTATION_LEFT) {
                 this.player.anims.play('turnToSide', true);
             }
             this.rotation = this.ROTATION_LEFT;
-            // this.player.setVelocityX(-160);
+            this.player.setVelocityX(-160);
             this.player.setVelocityY(0);
 
 
-        } else if (this.cursors.right.isDown || direction === 'RIGHT') {
+        } else if (this.cursors.right.isDown || this.direction === 'RIGHT') {
             if (this.rotation !== this.ROTATION_RIGHT) {
                 if (this.rotation === this.ROTATION_LEFT) {
                     this.player.anims.play('leftToRight');
@@ -561,15 +629,9 @@ class GameScene_Level_4 extends Scene {
                 }
             }
             this.rotation = this.ROTATION_RIGHT;
-            // this.player.setVelocityX(160);
+            this.player.setVelocityX(160);
             this.player.setVelocityY(0);
-        } else {
-            // player.setVelocityX(0);
-            // this.player.flipX = false;
-            // this.player.anims.play('turnToFront');
-        }
-
-        if (this.cursors.up.isDown || this.direction === 'UP') {
+        } else if (this.cursors.up.isDown || this.direction === 'UP') {
 
             if (this.rotation !== this.ROTATION_UP) {
                 if (this.rotation === this.ROTATION_LEFT) {
@@ -583,7 +645,7 @@ class GameScene_Level_4 extends Scene {
 
             this.rotation = this.ROTATION_UP;
             this.player.setVelocityX(0);
-            // this.player.setVelocityY(-160);
+            this.player.setVelocityY(-160);
 
         } else if (this.cursors.down.isDown || this.direction === 'DOWN') {
 
@@ -599,7 +661,7 @@ class GameScene_Level_4 extends Scene {
 
             this.rotation = this.ROTATION_DOWN;
             this.player.setVelocityX(0);
-            // this.player.setVelocityY(160);
+            this.player.setVelocityY(160);
         } else {
             // player.setVelocityY(0);
         }
@@ -612,5 +674,6 @@ class GameScene_Level_4 extends Scene {
 
 
 }
+
 
 export default GameScene_Level_4
