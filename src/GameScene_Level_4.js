@@ -12,7 +12,12 @@ import gameScene_Level_4 from "./GameScene_Level_4";
 
 let blockGenerator;
 let blockFunction;
-
+const dir = {
+    right: { isClear: true, isMoving: false },
+    left: { isClear: true, isMoving: false },
+    up: { isClear: true, isMoving: false },
+    down: { isClear: true, isMoving: false }
+};
 // let direction;
 
 class GameScene_Level_4 extends Scene {
@@ -26,12 +31,7 @@ class GameScene_Level_4 extends Scene {
     constructor() {
         super('GameScene_Level_4');
 
-        const dir = {
-            right: { isClear: true, isMoving: false },
-            left: { isClear: true, isMoving: false },
-            up: { isClear: true, isMoving: false },
-            down: { isClear: true, isMoving: false }
-        };
+
 
     //     Object.keys(dir).forEach(key => {
     //         Object.defineProperty(dir, key, {
@@ -237,7 +237,7 @@ class GameScene_Level_4 extends Scene {
         // this.player.body.bounce.set(1);
         this.player.body.setMaxSpeed(160);
         this.player.setCircle(20, 12, 28);
-        this.physics.add.collider(this.player, this.platforms, function (_player, _platform) {
+        this.physics.add.collider(this.player, this.wallLayer, function (_player, _platform) {
             this.objectCollidedWith = _platform;
             this.collided = true;
             this.walkedBy = false;
@@ -246,19 +246,16 @@ class GameScene_Level_4 extends Scene {
                 if (_player.body.blocked.up) {
                     console.log("frontBlocked");
                     // player.setY(player.y + 2);
-                    this.dir.up.isClear = false;
+                    dir.up.isClear = false;
                 } else if (_player.body.blocked.down) {
                     // player.setY(player.y - 2);
-                    this.dir.down.isClear = false;
+                    dir.down.isClear = false;
                 } else if (_player.body.blocked.right) {
                     // player.setX(player.x - 2);
-                    console.log(this.dir.right.isClear)
-                    this.dir.right.isClear = false;
-                    console.log(this.dir.right.isClear)
-                    console.log("rightBlocked");
+                    dir.right.isClear = false;
                 } else {
                     // player.setX(player.x + 2);
-                    this.dir.left.isClear = false;
+                    dir.left.isClear = false;
                 }
                 this.player.setVelocityX(0);
                 this.player.setVelocityY(0);
@@ -454,9 +451,9 @@ class GameScene_Level_4 extends Scene {
     }
 
 
-    static runBlocks = (blockList) => {
+    static runBlocks(blockList) {
         console.log(blockList);
-        blockGenerator = eval(`(function* () {
+        const blockGenerator = eval(`(function* () {
             ${blockList.join(';')}
         })`);
         blockFunction = blockGenerator();
@@ -534,10 +531,10 @@ class GameScene_Level_4 extends Scene {
                 // if (distClosest < Phaser.Math.Distance.Between(closest.x, closest.y, (closest.body.position.x + 1), (closest.body.position.y + 1))) {
                 if (distClosest > hypot) {
                     console.log("clear")
-                    this.leftIsClear = true;
-                    this.dir.right.isClear = true;
-                    this.downIsClear = true;
-                    this.upIsClear = true;
+                    dir.left.isClear = true;
+                    dir.right.isClear = true;
+                    dir.down.isClear = true;
+                    dir.up.isClear = true;
                     if (this.player.body.x - this.player.body.prev.x !== 0 && (this.rotation === 0 || this.rotation === 180)) {
                         this.walkedBy = true;
                     } else if (this.player.body.y - this.player.body.prev.y !== 0 && (this.rotation === 90 || this.rotation === -90)) {
@@ -558,11 +555,11 @@ class GameScene_Level_4 extends Scene {
 
 
             }
-            this.statusText.setText('  right clear: ' + this.dir.right.isClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
+            this.statusText.setText('  right clear: ' + dir.right.isClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
 
 
             if (playGame) {
-                let codeEval = code;
+                // let codeEval = code;
                 // console.log(codeEval);
                 // const blockCode = {
                 //     *generator() {

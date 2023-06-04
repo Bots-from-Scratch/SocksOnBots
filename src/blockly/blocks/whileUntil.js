@@ -18,14 +18,18 @@ Blockly.common.defineBlocksWithJsonArray([
     }
 ])
 
+
 Blockly.JavaScript['whileUntil'] = function (block) {
-    var dropdown_name = block.getInput('BOOL');
-    console.log("dropdown_name");
-    console.log(dropdown_name);
-    var args = block.getInput('DO');
-    console.log("args");
-    console.log(args);
-    var code = "'while(" + dropdown_name + "){yield" + args + "}'";
+    var dropdown_mode = block.getFieldValue('MODE');
+    var value_bool = Blockly.JavaScript.valueToCode(block, 'BOOL', Blockly.JavaScript.ORDER_NONE);
+    var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
+
+    var code = '';
+    if (dropdown_mode === 'WHILE') {
+        code = 'while (' + value_bool + ') {\n' + statements_do + '}\n';
+    } else if (dropdown_mode === 'UNTIL') {
+        code = 'while (!(' + value_bool + ')) {\n' + statements_do + '}\n';
+    }
 
     return code;
 };
