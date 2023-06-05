@@ -34,8 +34,8 @@ Blockly.common.defineBlocksWithJsonArray([{
 }])
 
 Blockly.JavaScript['direction_blocked'] = function (block) {
-    let dropdown_name = block.getFieldValue('NAME');
-    let code = "!dir." + dropdown_name + ".isClear";
+    let blockValue = block.getFieldValue('NAME');
+    let code = "!dir." + blockValue + ".isClear";
 
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
