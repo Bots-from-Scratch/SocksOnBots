@@ -206,7 +206,10 @@ export var toolboxJson = {
           "kind": "BLOCK",
           "type": "object_sock"
         },
-
+        {
+          "kind": "BLOCK",
+          "type": "walked_around"
+        },
       ]
     },
   ]

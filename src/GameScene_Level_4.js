@@ -20,7 +20,7 @@ const direction = {
 };
 let objectToScanFor;
 let blueStar;
-
+let walkedBy
 
 class GameScene_Level_4 extends Scene {
 
@@ -41,7 +41,7 @@ class GameScene_Level_4 extends Scene {
 
         this.score = 0;
 
-        this.walkedBy = false;
+        walkedBy = false;
 
         this.value;
         // let codeFromBlock;
@@ -214,10 +214,10 @@ class GameScene_Level_4 extends Scene {
         // this.player.body.bounce.set(1);
         this.player.body.setMaxSpeed(160);
         this.player.setCircle(20, 12, 28);
-        this.physics.add.collider(this.player, this.wallLayer, function (_player, _platform) {
+        this.physics.add.collider(this.player, this.rectangles, function (_player, _platform) {
             this.objectCollidedWith = _platform;
             this.collided = true;
-            this.walkedBy = false;
+            walkedBy = false;
             if (!_player.body.blocked.none) {
 
                 if (_player.body.blocked.up) {
@@ -338,8 +338,6 @@ class GameScene_Level_4 extends Scene {
             frameRate: 5,
             repeat: 0
         });
-
-
     }
 
 
@@ -389,8 +387,8 @@ class GameScene_Level_4 extends Scene {
         mapLayer.forEachTile(function (tile) {
             let tileWorldPos = mapLayer.tileToWorldXY(tile.x, tile.y);
             if (tile.properties.collision) {
-                let rectangle = new Phaser.GameObjects.Rectangle(this, tileWorldPos.x, tileWorldPos.y, tileWidth, tileHeight);
-                this.rectangles.add(rectangle.setOrigin(0, 0));
+                let rectangle = new Phaser.GameObjects.Rectangle(this, tileWorldPos.x + tileWidth/2, tileWorldPos.y + tileHeight/2, tileWidth, tileHeight);
+                this.rectangles.add(rectangle);
             }
         }, this);
     }
@@ -466,8 +464,6 @@ class GameScene_Level_4 extends Scene {
 
 
         if (this.scannedObject) {
-            console.log(this.blockingObjects);
-
             if (this.checkIfObjectBlocksViewline(this.blockingObjects)) {
                 console.log('not in view');
                 this.scanLineGfx.setVisible(false);
@@ -556,9 +552,9 @@ class GameScene_Level_4 extends Scene {
                     direction.down.isClear = true;
                     direction.up.isClear = true;
                     if (this.player.body.x - this.player.body.prev.x !== 0 && (this.rotation === 0 || this.rotation === 180)) {
-                        this.walkedBy = true;
+                        walkedBy = true;
                     } else if (this.player.body.y - this.player.body.prev.y !== 0 && (this.rotation === 90 || this.rotation === -90)) {
-                        this.walkedBy = true;
+                        walkedBy = true;
                     }
 
                     // this.physics.accelerateToObject(player, blueStar, 4000);
@@ -575,8 +571,8 @@ class GameScene_Level_4 extends Scene {
 
 
             }
-            // this.statusText.setText('  right clear: ' + direction.right.isClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
-            this.statusText.setText('  right clear: ' + direction.right.isClear + '\n moving right: ' + direction.right.isMoving + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
+            // this.statusText.setText('  right clear: ' + direction.right.isClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
+            this.statusText.setText('  right clear: ' + direction.right.isClear + '\n moving right: ' + direction.right.isMoving + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided + "\nobjectSighted: " + direction.toObject.isClear + "\nmoveToObject: " + direction.toObject.isMoving);
 
 
             if (playGame) {

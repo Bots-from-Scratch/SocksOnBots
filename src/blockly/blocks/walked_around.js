@@ -12,7 +12,7 @@ Blockly.common.defineBlocksWithJsonArray([
 
 Blockly.JavaScript['walked_around'] = function(block) {
     // TODO: Assemble JavaScript into code variable.
-    var code = 'this.walkedBy';
+    var code = 'walkedBy';
     // TODO: Change ORDER_NONE to the correct strength.
     return [code, Blockly.JavaScript.ORDER_NONE];
 };
