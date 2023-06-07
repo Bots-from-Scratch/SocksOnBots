@@ -18,6 +18,6 @@ Blockly.common.defineBlocksWithJsonArray([
 
 Blockly.JavaScript['object_sock'] = function(block) {
     // TODO: Assemble JavaScript into code variable.
-    var code = 'this.blueStar';
+    var code = 'blueStar';
     return [code, Blockly.JavaScript.ORDER_NONE];
 };

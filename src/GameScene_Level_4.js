@@ -8,16 +8,19 @@ import level_4 from "./assets/SocksOnBots_lvl_4.json";
 import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
 
 import {blockList, code, playGame} from "./index";
-import gameScene_Level_4 from "./GameScene_Level_4";
 
 let blockGenerator;
 let blockFunction;
 const dir = {
-    right: { isClear: true, isMoving: false },
-    left: { isClear: true, isMoving: false },
-    up: { isClear: true, isMoving: false },
-    down: { isClear: true, isMoving: false }
+    right: {isClear: true, isMoving: false},
+    left: {isClear: true, isMoving: false},
+    up: {isClear: true, isMoving: false},
+    down: {isClear: true, isMoving: false},
+    toObject: {isClear: false, isMoving: false}
 };
+let objectToScanFor;
+let blueStar;
+
 // let direction;
 
 class GameScene_Level_4 extends Scene {
@@ -32,28 +35,27 @@ class GameScene_Level_4 extends Scene {
         super('GameScene_Level_4');
 
 
-
-    //     Object.keys(dir).forEach(key => {
-    //         Object.defineProperty(dir, key, {
-    //             get() {
-    //                 return this._dir[key];
-    //             },
-    //             set(value) {
-    //                 this._dir[key] = value;
-    //             }
-    //         });
-    //     });
-    //
-    //     this._dir = dir;
-    //
-    // }
-    //
-    // get dir() {
-    //     return this._dir;
-    // }
-    //
-    // set dir(value) {
-    //     this._dir = value;
+        //     Object.keys(dir).forEach(key => {
+        //         Object.defineProperty(dir, key, {
+        //             get() {
+        //                 return this._dir[key];
+        //             },
+        //             set(value) {
+        //                 this._dir[key] = value;
+        //             }
+        //         });
+        //     });
+        //
+        //     this._dir = dir;
+        //
+        // }
+        //
+        // get dir() {
+        //     return this._dir;
+        // }
+        //
+        // set dir(value) {
+        //     this._dir = value;
     }
 
     init() {
@@ -84,7 +86,7 @@ class GameScene_Level_4 extends Scene {
         this.scannedObject = false;
         this.objectCollidedWith = {};
         this.blockingObjects = undefined;
-        this.objectToScanFor = undefined;
+        objectToScanFor = undefined;
         this.objectSighted = false;
         this.scanAngle = 0;
         this.itemCollected = false;
@@ -138,15 +140,11 @@ class GameScene_Level_4 extends Scene {
         // });
 
 
-
         this.createPlatforms();
         this.createPlayer();
         this.createCursor();
         this.createSock();
         this.createButtons();
-
-
-
 
 
         this.scoreText = this.add.text(192, 256, 'Level Completed', {fontSize: '64px', fill: '#fff'});
@@ -184,8 +182,8 @@ class GameScene_Level_4 extends Scene {
                 alpha: 0.5
             }
         });
-        this.scanGfx.setVisible(false);
-        this.scanLine = new Phaser.Geom.Line(this.player.x, this.player.y, this.blueStar.x, this.blueStar.y);
+        this.scanGfx.setVisible(true);
+        this.scanLine = new Phaser.Geom.Line(this.player.x, this.player.y, blueStar.x, blueStar.y);
 
         this.scanLineRot = new Phaser.Geom.Line(this.player.x, this.player.y, 300, 100);
 
@@ -367,11 +365,11 @@ class GameScene_Level_4 extends Scene {
     }
 
     createSock() {
-        this.blueStar = this.physics.add.sprite(750, 120, 'star');
-        // this.blueStar.setTint(0x006db2);
-        this.blueStar.setScale(0.4);
+        blueStar = this.physics.add.sprite(750, 120, 'star');
+        // blueStar.setTint(0x006db2);
+        blueStar.setScale(0.4);
 
-        this.physics.add.overlap(this.player, this.blueStar, this.collectStar, null, this);
+        this.physics.add.overlap(this.player, blueStar, this.collectStar, null, this);
     }
 
     createButtons() {
@@ -465,10 +463,27 @@ class GameScene_Level_4 extends Scene {
         dir.up.isMoving = false;
         dir.down.isClear = true;
         dir.down.isMoving = false;
-
+        dir.toObject.isClear = false;
+        dir.toObject.isMoving = false;
     }
 
     update() {
+
+        if (this.scannedObject) {
+            if (this.checkIfObjectBlocksViewline(this.blockingObjects)) {
+                console.log('not in view');
+                this.scanLineGfx.setVisible(false);
+                this.objectSighted = false;
+                dir.toObject.isClear = false;
+            } else {
+                this.scanLineGfx.setVisible(true);
+                this.objectSighted = true;
+                dir.toObject.isClear = true;
+            }
+        } else {
+            this.objectSighted = false;
+        }
+
         // console.log(this.direction);
         // let lastBlock;
         // for (const block of gen) {
@@ -500,14 +515,15 @@ class GameScene_Level_4 extends Scene {
         }
 
         if (!this.scannedObject) {
-            this.scanLineGfx.setVisible(false);
+            this.scanLineGfx.setVisible(true);
         }
         this.scanCircle.setPosition(this.player.x, this.player.y)
-        this.scanLine.setTo(this.player.x, this.player.y, this.blueStar.x, this.blueStar.y);
+        this.scanLine.setTo(this.player.x, this.player.y, blueStar.x, blueStar.y);
         this.scanAngle -= 0.04;
         Phaser.Geom.Line.SetToAngle(this.scanLineRot, this.player.x, this.player.y, this.scanAngle, 200);
-        if (Phaser.Geom.Intersects.LineToRectangle(this.scanLineRot, this.blueStar) && this.scannedObject) {
+        if (Phaser.Geom.Intersects.LineToRectangle(this.scanLineRot, blueStar) && this.scannedObject) {
             this.objectSighted = true;
+            dir.toObject.isClear = true;
         }
 
         this.scanGfx
@@ -515,8 +531,8 @@ class GameScene_Level_4 extends Scene {
             .strokeCircleShape(this.scanCircle).strokeLineShape(this.scanLineRot);
 
         this.scanLineGfx.clear().strokeLineShape(this.scanLine);
-        if (this.objectToScanFor) {
-            if (Phaser.Geom.Intersects.CircleToRectangle(this.scanCircle, this.objectToScanFor)) {
+        if (objectToScanFor) {
+            if (Phaser.Geom.Intersects.CircleToRectangle(this.scanCircle, objectToScanFor)) {
                 this.scannedObject = true;
                 this.scanGfx.lineStyle(2, 0xff0000);
             } else {
@@ -673,8 +689,8 @@ class GameScene_Level_4 extends Scene {
             // player.setVelocityY(0);
         }
 // playGame = false;
-        if (this.direction == 'TO_OBJECT') {
-            this.physics.accelerateToObject(this.player, this.blueStar, 4000);
+        if (dir.toObject.isClear && dir.toObject.isMoving) {
+            this.physics.accelerateToObject(this.player, blueStar, 4000);
             // player.setVelocityY(0);
         }
     }

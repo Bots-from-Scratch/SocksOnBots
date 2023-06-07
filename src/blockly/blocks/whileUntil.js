@@ -26,9 +26,9 @@ Blockly.JavaScript['whileUntil'] = function (block) {
 
     var code = '';
     if (dropdown_mode === 'WHILE') {
-        code = 'while (' + value_bool + ') {\n' + statements_do + '}\n';
+        code = 'yield;\nwhile (' + value_bool + ') {\n' + statements_do + '}\n';
     } else if (dropdown_mode === 'UNTIL') {
-        code = 'while (!(' + value_bool + ')) {\n' + statements_do + '}\n';
+        code = 'yield;\nwhile (!(' + value_bool + ')) {\n' + statements_do + '}\n';
     }
 
     return code;

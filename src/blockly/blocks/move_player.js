@@ -25,7 +25,7 @@ Blockly.common.defineBlocksWithJsonArray([
                     ],
                     [
                         "to object",
-                        "TO_OBJECT"
+                        "toObject"
                     ]
                 ]
             }

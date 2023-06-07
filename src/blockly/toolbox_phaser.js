@@ -193,7 +193,20 @@ export var toolboxJson = {
         {
           "kind": "BLOCK",
           "type": "whileUntil"
-        }
+        },
+        {
+          "kind": "BLOCK",
+          "type": "bool_sighted"
+        },
+        {
+          "kind": "BLOCK",
+          "type": "scan_for_object"
+        },
+        {
+          "kind": "BLOCK",
+          "type": "object_sock"
+        },
+
       ]
     },
   ]
