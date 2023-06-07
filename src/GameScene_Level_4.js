@@ -11,7 +11,7 @@ import {blockList, code, playGame} from "./index";
 
 let blockGenerator;
 let blockFunction;
-const dir = {
+const direction = {
     right: {isClear: true, isMoving: false},
     left: {isClear: true, isMoving: false},
     up: {isClear: true, isMoving: false},
@@ -21,7 +21,6 @@ const dir = {
 let objectToScanFor;
 let blueStar;
 
-// let direction;
 
 class GameScene_Level_4 extends Scene {
 
@@ -33,35 +32,11 @@ class GameScene_Level_4 extends Scene {
 
     constructor() {
         super('GameScene_Level_4');
-
-
-        //     Object.keys(dir).forEach(key => {
-        //         Object.defineProperty(dir, key, {
-        //             get() {
-        //                 return this._dir[key];
-        //             },
-        //             set(value) {
-        //                 this._dir[key] = value;
-        //             }
-        //         });
-        //     });
-        //
-        //     this._dir = dir;
-        //
-        // }
-        //
-        // get dir() {
-        //     return this._dir;
-        // }
-        //
-        // set dir(value) {
-        //     this._dir = value;
     }
 
     init() {
-        this.resetDir();
+        this.resetDirection();
 
-        this.direction = '';
         this.level = 4;
 
         this.score = 0;
@@ -240,16 +215,16 @@ class GameScene_Level_4 extends Scene {
                 if (_player.body.blocked.up) {
                     console.log("frontBlocked");
                     // player.setY(player.y + 2);
-                    dir.up.isClear = false;
+                    direction.up.isClear = false;
                 } else if (_player.body.blocked.down) {
                     // player.setY(player.y - 2);
-                    dir.down.isClear = false;
+                    direction.down.isClear = false;
                 } else if (_player.body.blocked.right) {
                     // player.setX(player.x - 2);
-                    dir.right.isClear = false;
+                    direction.right.isClear = false;
                 } else {
                     // player.setX(player.x + 2);
-                    dir.left.isClear = false;
+                    direction.left.isClear = false;
                 }
                 this.player.setVelocityX(0);
                 this.player.setVelocityY(0);
@@ -454,17 +429,17 @@ class GameScene_Level_4 extends Scene {
     }
 
 
-    resetDir() {
-        dir.right.isClear = true;
-        dir.right.isMoving = false;
-        dir.left.isClear = true;
-        dir.left.isMoving = false;
-        dir.up.isClear = true;
-        dir.up.isMoving = false;
-        dir.down.isClear = true;
-        dir.down.isMoving = false;
-        dir.toObject.isClear = false;
-        dir.toObject.isMoving = false;
+    resetDirection() {
+        direction.right.isClear = true;
+        direction.right.isMoving = false;
+        direction.left.isClear = true;
+        direction.left.isMoving = false;
+        direction.up.isClear = true;
+        direction.up.isMoving = false;
+        direction.down.isClear = true;
+        direction.down.isMoving = false;
+        direction.toObject.isClear = false;
+        direction.toObject.isMoving = false;
     }
 
     update() {
@@ -474,17 +449,16 @@ class GameScene_Level_4 extends Scene {
                 console.log('not in view');
                 this.scanLineGfx.setVisible(false);
                 this.objectSighted = false;
-                dir.toObject.isClear = false;
+                direction.toObject.isClear = false;
             } else {
                 this.scanLineGfx.setVisible(true);
                 this.objectSighted = true;
-                dir.toObject.isClear = true;
+                direction.toObject.isClear = true;
             }
         } else {
             this.objectSighted = false;
         }
 
-        // console.log(this.direction);
         // let lastBlock;
         // for (const block of gen) {
         //     console.log("Next block: " + block);
@@ -493,7 +467,7 @@ class GameScene_Level_4 extends Scene {
         // direction = lastBlock;
         // console.log(this.direction + playGame);
         if (blockFunction !== undefined) {
-            console.log(dir.right.isClear)
+            console.log(direction.right.isClear)
             var blockResult = blockFunction.next();
             console.log("next")
             if (blockResult.value !== undefined) {
@@ -503,7 +477,7 @@ class GameScene_Level_4 extends Scene {
             if (blockResult.done) {
                 //...
                 blockFunction = undefined;
-                this.resetDir();
+                this.resetDirection();
             }
         }
 
@@ -523,7 +497,7 @@ class GameScene_Level_4 extends Scene {
         Phaser.Geom.Line.SetToAngle(this.scanLineRot, this.player.x, this.player.y, this.scanAngle, 200);
         if (Phaser.Geom.Intersects.LineToRectangle(this.scanLineRot, blueStar) && this.scannedObject) {
             this.objectSighted = true;
-            dir.toObject.isClear = true;
+            direction.toObject.isClear = true;
         }
 
         this.scanGfx
@@ -555,10 +529,10 @@ class GameScene_Level_4 extends Scene {
                 // if (distClosest < Phaser.Math.Distance.Between(closest.x, closest.y, (closest.body.position.x + 1), (closest.body.position.y + 1))) {
                 if (distClosest > hypot) {
                     console.log("clear")
-                    dir.left.isClear = true;
-                    dir.right.isClear = true;
-                    dir.down.isClear = true;
-                    dir.up.isClear = true;
+                    direction.left.isClear = true;
+                    direction.right.isClear = true;
+                    direction.down.isClear = true;
+                    direction.up.isClear = true;
                     if (this.player.body.x - this.player.body.prev.x !== 0 && (this.rotation === 0 || this.rotation === 180)) {
                         this.walkedBy = true;
                     } else if (this.player.body.y - this.player.body.prev.y !== 0 && (this.rotation === 90 || this.rotation === -90)) {
@@ -579,30 +553,13 @@ class GameScene_Level_4 extends Scene {
 
 
             }
-            // this.statusText.setText('  right clear: ' + dir.right.isClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
-            this.statusText.setText('  right clear: ' + dir.right.isClear + '\n moving right: ' + dir.right.isMoving + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
+            // this.statusText.setText('  right clear: ' + direction.right.isClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
+            this.statusText.setText('  right clear: ' + direction.right.isClear + '\n moving right: ' + direction.right.isMoving + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
 
 
             if (playGame) {
-                // let codeEval = code;
-                // console.log(codeEval);
-                // const blockCode = {
-                //     *generator() {
-                //         let codeEval = eval(code);
-                //         console.log()
-                //     }
-                // }
-                // eval(code);
-                if (this.direction === '') {
-                    this.player.setVelocityX(0);
-                    this.player.setVelocityY(0);
-                }
-                try {
 
 
-                } catch (error) {
-                    console.log(error);
-                }
             }
 
         }
@@ -630,7 +587,7 @@ class GameScene_Level_4 extends Scene {
         }
 
 
-        if (this.cursors.left.isDown || dir.left.isMoving) {
+        if (this.cursors.left.isDown || direction.left.isMoving) {
 
             if (this.rotation !== this.ROTATION_LEFT) {
                 this.player.anims.play('turnToSide', true);
@@ -638,8 +595,8 @@ class GameScene_Level_4 extends Scene {
             this.rotation = this.ROTATION_LEFT;
             this.player.setVelocityX(-160);
             // this.player.setVelocityY(0);
-            this.resetDir();
-        } else if (this.cursors.right.isDown || dir.right.isMoving) {
+            this.resetDirection();
+        } else if (this.cursors.right.isDown || direction.right.isMoving) {
             if (this.rotation !== this.ROTATION_RIGHT) {
                 if (this.rotation === this.ROTATION_LEFT) {
                     this.player.anims.play('leftToRight');
@@ -652,8 +609,8 @@ class GameScene_Level_4 extends Scene {
             this.rotation = this.ROTATION_RIGHT;
             this.player.setVelocityX(160);
             // this.player.setVelocityY(0);
-            this.resetDir();
-        } else if (this.cursors.up.isDown || dir.up.isMoving) {
+            this.resetDirection();
+        } else if (this.cursors.up.isDown || direction.up.isMoving) {
 
             if (this.rotation !== this.ROTATION_UP) {
                 if (this.rotation === this.ROTATION_LEFT) {
@@ -668,8 +625,8 @@ class GameScene_Level_4 extends Scene {
             this.rotation = this.ROTATION_UP;
             this.player.setVelocityX(0);
             this.player.setVelocityY(-160);
-            this.resetDir();
-        } else if (this.cursors.down.isDown || dir.down.isMoving) {
+            this.resetDirection();
+        } else if (this.cursors.down.isDown || direction.down.isMoving) {
 
             if (this.rotation !== this.ROTATION_DOWN) {
                 if (this.rotation === this.ROTATION_LEFT) {
@@ -684,12 +641,12 @@ class GameScene_Level_4 extends Scene {
             this.rotation = this.ROTATION_DOWN;
             this.player.setVelocityX(0);
             this.player.setVelocityY(160);
-            this.resetDir();
+            this.resetDirection();
         } else {
             // player.setVelocityY(0);
         }
 // playGame = false;
-        if (dir.toObject.isClear && dir.toObject.isMoving) {
+        if (direction.toObject.isClear && direction.toObject.isMoving) {
             this.physics.accelerateToObject(this.player, blueStar, 4000);
             // player.setVelocityY(0);
         }

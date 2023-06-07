@@ -11,7 +11,7 @@ Blockly.common.defineBlocksWithJsonArray([
 
 Blockly.JavaScript['bool_sighted'] = function(block) {
     // TODO: Assemble JavaScript into code variable.
-    var code = 'dir.toObject.isClear';
+    var code = 'direction.toObject.isClear';
     // TODO: Change ORDER_NONE to the correct strength.
     return [code, Blockly.JavaScript.ORDER_NONE];
 };
