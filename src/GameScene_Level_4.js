@@ -83,15 +83,16 @@ class GameScene_Level_4 extends Scene {
         // this.add.image(400, 300, 'sky');
 
 
-        this.map = this.make.tilemap({key: 'map'});
+        const map = this.make.tilemap({key: 'map'});
 
 
-        const tileset = this.map.addTilesetImage('CosmicLilac_Tiles_64x64-cd3', 'tileset');
-        const backgroundLayer = this.map.createLayer('background', tileset, 0, 0);
-        const groundLayer = this.map.createLayer('floor', tileset, 0, 0);
-        this.wallLayer = this.map.createLayer('walls', tileset, 0, 0);
-        const objectLayer = this.map.createLayer('objects', tileset, 0, 0);
-
+        const tileset = map.addTilesetImage('CosmicLilac_Tiles_64x64-cd3', 'tileset');
+        const backgroundLayer = map.createLayer('background', tileset, 0, 0);
+        const groundLayer = map.createLayer('floor', tileset, 0, 0);
+        this.wallLayer = map.createLayer('walls', tileset, 0, 0);
+        const objectLayer = map.createLayer('objects', tileset, 0, 0);
+        console.log("this.wallLayer");
+        console.log(this.wallLayer);
 
         this.wallLayer.setCollisionByProperty({collision: true});
         // this.wallLayer.setCollisionFromCollisionGroup(true, true);
@@ -102,10 +103,10 @@ class GameScene_Level_4 extends Scene {
         const collisionRect = new Phaser.Geom.Rectangle();
 
         // let gidMapEntries = this.wallLayer.tileset[0].getTileData(0);
-
+        //
         // for (const el of gidMapEntries) console.log(el[1]);
 
-        this.map.setBaseTileSize(64, 64);
+        map.setBaseTileSize(64, 64);
 
 
         // const debugGraphics = this.add.graphics().setAlpha(0.5);
@@ -115,7 +116,7 @@ class GameScene_Level_4 extends Scene {
         // });
 
 
-        this.createPlatforms();
+        this.createBlockingObjects(map);
         this.createPlayer();
         this.createCursor();
         this.createSock();
@@ -172,7 +173,12 @@ class GameScene_Level_4 extends Scene {
 
         // this.testBlockRect = new Phaser.Geom.Rectangle(200, 50, 100, 200);
         this.scanCircle = new Phaser.Geom.Circle(300, 400, this.SCAN_DISTANCE);
-        this.blockingObjects = this.platforms;
+
+        this.frameGraphics = this.add.graphics();
+        this.frameColor = 0x00ff00; // Rahmenfarbe (Grün)
+        this.blockingObjects = this.rectangles;
+
+
     }
 
 
@@ -180,14 +186,16 @@ class GameScene_Level_4 extends Scene {
 //-------CREATE FUNCTIONS
 
 
-    createPlatforms() {
-        this.platforms = this.physics.add.staticGroup();
+    createBlockingObjects(map) {
+        // this.platforms = this.physics.add.staticGroup();
+        this.rectangles = this.physics.add.staticGroup();
+        this.createTileFrames(this.wallLayer);
 
         // this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        this.platforms.create(512, 128, 'ground').setScale(0.66, 8.1).setAlpha(0).refreshBody();
+        // this.platforms.create(512, 128, 'ground').setScale(0.66, 8.1).setAlpha(0).refreshBody();
         //
         //
-        this.platforms.create(864, 288, 'ground').setScale(0.5, 6).setAlpha(0).refreshBody();
+        // this.platforms.create(864, 288, 'ground').setScale(0.5, 6).setAlpha(0).refreshBody();
         // this.platforms.create(50, 250, 'ground');
         // this.platforms.create(750, 220, 'ground');
 
@@ -202,7 +210,7 @@ class GameScene_Level_4 extends Scene {
         if (this.level === 4) {
             this.player.setX(160).setY(80);
         }
-        ;
+
         // this.player.body.bounce.set(1);
         this.player.body.setMaxSpeed(160);
         this.player.setCircle(20, 12, 28);
@@ -353,11 +361,11 @@ class GameScene_Level_4 extends Scene {
         this.buttonScan = this.add.text(600, 450, 'Scan For Star');
         this.button.setInteractive();
         this.buttonUp.setInteractive().setVisible(false);
-        this.buttonScan.setInteractive().setVisible(false);
+        this.buttonScan.setInteractive().setVisible(true);
         this.button.on('pointerover', () => this.button.setStyle({fill: '#006db2'})).on('pointerout', () => this.button.setStyle({fill: '#fff'})).on('pointerdown', () => this.scene.start('PreloadScene'));
         this.buttonScan.on('pointerdown', () => {
+            objectToScanFor = blueStar;
             if (this.scannedObject) {
-                console.log(this.blockingObjects);
                 if (this.checkIfObjectBlocksViewline(this.blockingObjects)) {
                     console.log('not in view');
                     this.scanLineGfx.setVisible(false);
@@ -374,6 +382,18 @@ class GameScene_Level_4 extends Scene {
         });
     }
 
+    createTileFrames(mapLayer) {
+        let map = mapLayer.tilemap;
+        let tileWidth = map.tileWidth;
+        let tileHeight = map.tileHeight;
+        mapLayer.forEachTile(function (tile) {
+            let tileWorldPos = mapLayer.tileToWorldXY(tile.x, tile.y);
+            if (tile.properties.collision) {
+                let rectangle = new Phaser.GameObjects.Rectangle(this, tileWorldPos.x, tileWorldPos.y, tileWidth, tileHeight);
+                this.rectangles.add(rectangle.setOrigin(0, 0));
+            }
+        }, this);
+    }
     checkIfObjectBlocksViewline(gameObject) {
 
         if (gameObject.isParent) {
@@ -444,7 +464,10 @@ class GameScene_Level_4 extends Scene {
 
     update() {
 
+
         if (this.scannedObject) {
+            console.log(this.blockingObjects);
+
             if (this.checkIfObjectBlocksViewline(this.blockingObjects)) {
                 console.log('not in view');
                 this.scanLineGfx.setVisible(false);
@@ -467,7 +490,6 @@ class GameScene_Level_4 extends Scene {
         // direction = lastBlock;
         // console.log(this.direction + playGame);
         if (blockFunction !== undefined) {
-            console.log(direction.right.isClear)
             var blockResult = blockFunction.next();
             console.log("next")
             if (blockResult.value !== undefined) {
@@ -481,12 +503,12 @@ class GameScene_Level_4 extends Scene {
             }
         }
 
-        var tile = this.wallLayer.getTileAtWorldXY(this.player.x, this.player.y, true);
-        // console.log(this.player.x + '  ' + this.player.y);
-        if (tile && tile.properties.slowingDown) {
-            // slow down the player
-            this.player.setVelocity(this.player.body.velocity.x * 0.5, this.player.body.velocity.y * 0.5);
-        }
+        // var tile = wallLayer.getTileAtWorldXY(this.player.x, this.player.y, true);
+        // // console.log(this.player.x + '  ' + this.player.y);
+        // if (tile && tile.properties.slowingDown) {
+        //     // slow down the player
+        //     this.player.setVelocity(this.player.body.velocity.x * 0.5, this.player.body.velocity.y * 0.5);
+        // }
 
         if (!this.scannedObject) {
             this.scanLineGfx.setVisible(true);
@@ -651,6 +673,7 @@ class GameScene_Level_4 extends Scene {
             // player.setVelocityY(0);
         }
     }
+
 
 
 }
