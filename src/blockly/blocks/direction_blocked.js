@@ -1,3 +1,5 @@
+import GameScene_Level_4 from "../../GameScene_Level_4";
+
 Blockly.common.defineBlocksWithJsonArray([{
     "type": "direction_blocked",
     "message0": "%1",
@@ -8,19 +10,19 @@ Blockly.common.defineBlocksWithJsonArray([{
             "options": [
                 [
                     "right is blocked",
-                    "RIGHT_BLOCKED"
+                    "right"
                 ],
                 [
                     "left is blocked",
-                    "LEFT_BLOCKED"
+                    "left"
                 ],
                 [
                     "up is blocked",
-                    "UP_BLOCKED"
+                    "up"
                 ],
                 [
                     "down is blocked",
-                    "DOWN_BLOCKED"
+                    "down"
                 ]
             ]
         }
@@ -31,20 +33,9 @@ Blockly.common.defineBlocksWithJsonArray([{
     "helpUrl": ""
 }])
 
-Blockly.JavaScript['direction_blocked'] = function(block) {
-    var dropdown_name = block.getFieldValue('NAME');
-    var code = '';
-    // TODO: Assemble JavaScript into code variable.
-    if (dropdown_name == 'RIGHT_BLOCKED') {
-        code += '!this.rightIsClear'
-    } else if (dropdown_name == 'LEFT_BLOCKED') {
-        code += '!this.leftIsClear'
-    } else if (dropdown_name == 'UP_BLOCKED') {
-        code += '!this.upIsClear'
-    } else {
-        code += '!this.downIsClear'
-    }
+Blockly.JavaScript['direction_blocked'] = function (block) {
+    let blockValue = block.getFieldValue('NAME');
+    let code = "!dir." + blockValue + ".isClear";
 
-    // TODO: Change ORDER_NONE to the correct strength.
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };

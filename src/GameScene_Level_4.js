@@ -7,21 +7,60 @@ import bot_with_sock from "./assets/Spritesheet.png"
 import level_4 from "./assets/SocksOnBots_lvl_4.json";
 import tileset from "./assets/CosmicLilac_Tiles_64x64-cd3.png";
 
-import {code, playGame} from "./index";
+import {blockList, code, playGame} from "./index";
+
+let blockGenerator;
+let blockFunction;
+const dir = {
+    right: {isClear: true, isMoving: false},
+    left: {isClear: true, isMoving: false},
+    up: {isClear: true, isMoving: false},
+    down: {isClear: true, isMoving: false},
+    toObject: {isClear: false, isMoving: false}
+};
+let objectToScanFor;
+let blueStar;
+
+// let direction;
 
 class GameScene_Level_4 extends Scene {
+
     ROTATION_RIGHT = 0;
     ROTATION_LEFT = 180;
     ROTATION_UP = -90;
     ROTATION_DOWN = 90;
     SCAN_DISTANCE = 200;
 
-
     constructor() {
         super('GameScene_Level_4');
+
+
+        //     Object.keys(dir).forEach(key => {
+        //         Object.defineProperty(dir, key, {
+        //             get() {
+        //                 return this._dir[key];
+        //             },
+        //             set(value) {
+        //                 this._dir[key] = value;
+        //             }
+        //         });
+        //     });
+        //
+        //     this._dir = dir;
+        //
+        // }
+        //
+        // get dir() {
+        //     return this._dir;
+        // }
+        //
+        // set dir(value) {
+        //     this._dir = value;
     }
 
     init() {
+        this.resetDir();
+
         this.direction = '';
         this.level = 4;
 
@@ -47,7 +86,7 @@ class GameScene_Level_4 extends Scene {
         this.scannedObject = false;
         this.objectCollidedWith = {};
         this.blockingObjects = undefined;
-        this.objectToScanFor = undefined;
+        objectToScanFor = undefined;
         this.objectSighted = false;
         this.scanAngle = 0;
         this.itemCollected = false;
@@ -67,7 +106,6 @@ class GameScene_Level_4 extends Scene {
 
     create() {
         // this.add.image(400, 300, 'sky');
-
 
 
         this.map = this.make.tilemap({key: 'map'});
@@ -101,12 +139,12 @@ class GameScene_Level_4 extends Scene {
         //     collidingTileColor: new Phaser.Display.Color(255, 255, 50, 255)
         // });
 
+
         this.createPlatforms();
         this.createPlayer();
         this.createCursor();
         this.createSock();
         this.createButtons();
-
 
 
         this.scoreText = this.add.text(192, 256, 'Level Completed', {fontSize: '64px', fill: '#fff'});
@@ -119,7 +157,7 @@ class GameScene_Level_4 extends Scene {
             fontSize: '16px',
             fill: '#fff'
         });
-        this.statusText.setVisible(false);
+        this.statusText.setVisible(true);
 
         this.gfx = this.add.graphics();
         // this.bombs = this.physics.add.group();
@@ -144,8 +182,8 @@ class GameScene_Level_4 extends Scene {
                 alpha: 0.5
             }
         });
-        this.scanGfx.setVisible(false);
-        this.scanLine = new Phaser.Geom.Line(this.player.x, this.player.y, this.blueStar.x, this.blueStar.y);
+        this.scanGfx.setVisible(true);
+        this.scanLine = new Phaser.Geom.Line(this.player.x, this.player.y, blueStar.x, blueStar.y);
 
         this.scanLineRot = new Phaser.Geom.Line(this.player.x, this.player.y, 300, 100);
 
@@ -165,6 +203,7 @@ class GameScene_Level_4 extends Scene {
 
 //------------------------------------------------------------------------------------------------------------
 //-------CREATE FUNCTIONS
+
 
     createPlatforms() {
         this.platforms = this.physics.add.staticGroup();
@@ -192,24 +231,25 @@ class GameScene_Level_4 extends Scene {
         // this.player.body.bounce.set(1);
         this.player.body.setMaxSpeed(160);
         this.player.setCircle(20, 12, 28);
-        this.physics.add.collider(this.player, this.platforms, function (_player, _platform) {
+        this.physics.add.collider(this.player, this.wallLayer, function (_player, _platform) {
             this.objectCollidedWith = _platform;
             this.collided = true;
             this.walkedBy = false;
             if (!_player.body.blocked.none) {
 
                 if (_player.body.blocked.up) {
+                    console.log("frontBlocked");
                     // player.setY(player.y + 2);
-                    this.upIsClear = false;
+                    dir.up.isClear = false;
                 } else if (_player.body.blocked.down) {
                     // player.setY(player.y - 2);
-                    this.downIsClear = false;
+                    dir.down.isClear = false;
                 } else if (_player.body.blocked.right) {
                     // player.setX(player.x - 2);
-                    this.rightIsClear = false;
+                    dir.right.isClear = false;
                 } else {
                     // player.setX(player.x + 2);
-                    this.leftIsClear = false;
+                    dir.left.isClear = false;
                 }
                 this.player.setVelocityX(0);
                 this.player.setVelocityY(0);
@@ -325,11 +365,11 @@ class GameScene_Level_4 extends Scene {
     }
 
     createSock() {
-        this.blueStar = this.physics.add.sprite(750, 120, 'star');
-        // this.blueStar.setTint(0x006db2);
-        this.blueStar.setScale(0.4);
+        blueStar = this.physics.add.sprite(750, 120, 'star');
+        // blueStar.setTint(0x006db2);
+        blueStar.setScale(0.4);
 
-        this.physics.add.overlap(this.player, this.blueStar, this.collectStar, null, this);
+        this.physics.add.overlap(this.player, blueStar, this.collectStar, null, this);
     }
 
     createButtons() {
@@ -404,24 +444,86 @@ class GameScene_Level_4 extends Scene {
         }
     }
 
+
+    static runBlocks(blockList) {
+        console.log(blockList);
+        const blockGenerator = eval(`(function* () {
+            ${blockList.join(';')}
+        })`);
+        blockFunction = blockGenerator();
+    }
+
+
+    resetDir() {
+        dir.right.isClear = true;
+        dir.right.isMoving = false;
+        dir.left.isClear = true;
+        dir.left.isMoving = false;
+        dir.up.isClear = true;
+        dir.up.isMoving = false;
+        dir.down.isClear = true;
+        dir.down.isMoving = false;
+        dir.toObject.isClear = false;
+        dir.toObject.isMoving = false;
+    }
+
     update() {
 
+        if (this.scannedObject) {
+            if (this.checkIfObjectBlocksViewline(this.blockingObjects)) {
+                console.log('not in view');
+                this.scanLineGfx.setVisible(false);
+                this.objectSighted = false;
+                dir.toObject.isClear = false;
+            } else {
+                this.scanLineGfx.setVisible(true);
+                this.objectSighted = true;
+                dir.toObject.isClear = true;
+            }
+        } else {
+            this.objectSighted = false;
+        }
+
+        // console.log(this.direction);
+        // let lastBlock;
+        // for (const block of gen) {
+        //     console.log("Next block: " + block);
+        //     lastBlock = block;
+        // }
+        // direction = lastBlock;
+        // console.log(this.direction + playGame);
+        if (blockFunction !== undefined) {
+            console.log(dir.right.isClear)
+            var blockResult = blockFunction.next();
+            console.log("next")
+            if (blockResult.value !== undefined) {
+                console.log(blockResult.value);
+                blockResult.value;
+            }
+            if (blockResult.done) {
+                //...
+                blockFunction = undefined;
+                this.resetDir();
+            }
+        }
+
         var tile = this.wallLayer.getTileAtWorldXY(this.player.x, this.player.y, true);
-        console.log(this.player.x + '  ' + this.player.y);
+        // console.log(this.player.x + '  ' + this.player.y);
         if (tile && tile.properties.slowingDown) {
             // slow down the player
             this.player.setVelocity(this.player.body.velocity.x * 0.5, this.player.body.velocity.y * 0.5);
         }
 
         if (!this.scannedObject) {
-            this.scanLineGfx.setVisible(false);
+            this.scanLineGfx.setVisible(true);
         }
         this.scanCircle.setPosition(this.player.x, this.player.y)
-        this.scanLine.setTo(this.player.x, this.player.y, this.blueStar.x, this.blueStar.y);
+        this.scanLine.setTo(this.player.x, this.player.y, blueStar.x, blueStar.y);
         this.scanAngle -= 0.04;
         Phaser.Geom.Line.SetToAngle(this.scanLineRot, this.player.x, this.player.y, this.scanAngle, 200);
-        if (Phaser.Geom.Intersects.LineToRectangle(this.scanLineRot, this.blueStar) && this.scannedObject) {
+        if (Phaser.Geom.Intersects.LineToRectangle(this.scanLineRot, blueStar) && this.scannedObject) {
             this.objectSighted = true;
+            dir.toObject.isClear = true;
         }
 
         this.scanGfx
@@ -429,8 +531,8 @@ class GameScene_Level_4 extends Scene {
             .strokeCircleShape(this.scanCircle).strokeLineShape(this.scanLineRot);
 
         this.scanLineGfx.clear().strokeLineShape(this.scanLine);
-        if (this.objectToScanFor) {
-            if (Phaser.Geom.Intersects.CircleToRectangle(this.scanCircle, this.objectToScanFor)) {
+        if (objectToScanFor) {
+            if (Phaser.Geom.Intersects.CircleToRectangle(this.scanCircle, objectToScanFor)) {
                 this.scannedObject = true;
                 this.scanGfx.lineStyle(2, 0xff0000);
             } else {
@@ -453,10 +555,10 @@ class GameScene_Level_4 extends Scene {
                 // if (distClosest < Phaser.Math.Distance.Between(closest.x, closest.y, (closest.body.position.x + 1), (closest.body.position.y + 1))) {
                 if (distClosest > hypot) {
                     console.log("clear")
-                    this.leftIsClear = true;
-                    this.rightIsClear = true;
-                    this.downIsClear = true;
-                    this.upIsClear = true;
+                    dir.left.isClear = true;
+                    dir.right.isClear = true;
+                    dir.down.isClear = true;
+                    dir.up.isClear = true;
                     if (this.player.body.x - this.player.body.prev.x !== 0 && (this.rotation === 0 || this.rotation === 180)) {
                         this.walkedBy = true;
                     } else if (this.player.body.y - this.player.body.prev.y !== 0 && (this.rotation === 90 || this.rotation === -90)) {
@@ -477,12 +579,24 @@ class GameScene_Level_4 extends Scene {
 
 
             }
-            this.statusText.setText('  right clear: ' + this.rightIsClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
+            // this.statusText.setText('  right clear: ' + dir.right.isClear + ' Object sighted: ' + this.objectSighted + '\n distClosest: ' + distClosest + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
+            this.statusText.setText('  right clear: ' + dir.right.isClear + '\n moving right: ' + dir.right.isMoving + ' hypot: ' + hypot + ' body.angle: ' + this.player.body.angle + '\nwalkedBy: ' + this.walkedBy + '\nx: ' + this.player.body.prev.x + ' collided:' + this.collided);
 
 
             if (playGame) {
-                eval(code);
-                this.physics.velocityFromAngle(this.rotation, this.player.body.maxSpeed, this.player.body.acceleration);
+                // let codeEval = code;
+                // console.log(codeEval);
+                // const blockCode = {
+                //     *generator() {
+                //         let codeEval = eval(code);
+                //         console.log()
+                //     }
+                // }
+                // eval(code);
+                if (this.direction === '') {
+                    this.player.setVelocityX(0);
+                    this.player.setVelocityY(0);
+                }
                 try {
 
 
@@ -516,17 +630,16 @@ class GameScene_Level_4 extends Scene {
         }
 
 
-        if (this.cursors.left.isDown || this.direction === 'LEFT') {
+        if (this.cursors.left.isDown || dir.left.isMoving) {
 
             if (this.rotation !== this.ROTATION_LEFT) {
                 this.player.anims.play('turnToSide', true);
             }
             this.rotation = this.ROTATION_LEFT;
-            // this.player.setVelocityX(-160);
-            this.player.setVelocityY(0);
-
-
-        } else if (this.cursors.right.isDown || this.direction === 'RIGHT') {
+            this.player.setVelocityX(-160);
+            // this.player.setVelocityY(0);
+            this.resetDir();
+        } else if (this.cursors.right.isDown || dir.right.isMoving) {
             if (this.rotation !== this.ROTATION_RIGHT) {
                 if (this.rotation === this.ROTATION_LEFT) {
                     this.player.anims.play('leftToRight');
@@ -537,15 +650,10 @@ class GameScene_Level_4 extends Scene {
                 }
             }
             this.rotation = this.ROTATION_RIGHT;
-            // this.player.setVelocityX(160);
-            this.player.setVelocityY(0);
-        } else {
-            // player.setVelocityX(0);
-            // this.player.flipX = false;
-            // this.player.anims.play('turnToFront');
-        }
-
-        if (this.cursors.up.isDown || this.direction === 'UP') {
+            this.player.setVelocityX(160);
+            // this.player.setVelocityY(0);
+            this.resetDir();
+        } else if (this.cursors.up.isDown || dir.up.isMoving) {
 
             if (this.rotation !== this.ROTATION_UP) {
                 if (this.rotation === this.ROTATION_LEFT) {
@@ -559,9 +667,9 @@ class GameScene_Level_4 extends Scene {
 
             this.rotation = this.ROTATION_UP;
             this.player.setVelocityX(0);
-            // this.player.setVelocityY(-160);
-
-        } else if (this.cursors.down.isDown || this.direction === 'DOWN') {
+            this.player.setVelocityY(-160);
+            this.resetDir();
+        } else if (this.cursors.down.isDown || dir.down.isMoving) {
 
             if (this.rotation !== this.ROTATION_DOWN) {
                 if (this.rotation === this.ROTATION_LEFT) {
@@ -575,16 +683,20 @@ class GameScene_Level_4 extends Scene {
 
             this.rotation = this.ROTATION_DOWN;
             this.player.setVelocityX(0);
-            // this.player.setVelocityY(160);
+            this.player.setVelocityY(160);
+            this.resetDir();
         } else {
             // player.setVelocityY(0);
         }
 // playGame = false;
-        if (this.direction == 'TO_OBJECT') {
-            this.physics.accelerateToObject(this.player, this.blueStar, 4000);
+        if (dir.toObject.isClear && dir.toObject.isMoving) {
+            this.physics.accelerateToObject(this.player, blueStar, 4000);
             // player.setVelocityY(0);
         }
     }
+
+
 }
+
 
 export default GameScene_Level_4
