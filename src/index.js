@@ -14,75 +14,6 @@ var blockList = [];
 let blockListTmp = [];
 let code;
 
-// const startBlocks = {
-//     blocks: {
-//         languageVersion: 0,
-//         blocks: [
-//             {
-//                 type: "move_player",
-//                 x: 38,
-//                 y: 62,
-//                 fields: {
-//                     VALUE: "RIGHT",
-//                 },
-//                 next: {
-//                     block: {
-//                         type: "move_player",
-//                         fields: {
-//                             VALUE: "DOWN",
-//                         },
-//                     },
-//                 },
-//             },
-//         ],
-//     },
-// };
-// const startBlocks = {
-//     blocks: {
-//
-//         languageVersion: 0,
-//         blocks: [
-//             {
-//                 "type": "move_player",
-//                 "id": "m45=aU)/(p)y%*Tk*R|x",
-//                 "x": 12,
-//                 "y": 37,
-//                 "fields": {
-//                     "VALUE": "RIGHT"
-//                 },
-//                 "next": {
-//                     "block": {
-//                         "type": "controls_if",
-//                         "id": "H!K.)VZClI@YyP`91Af4",
-//                         "inputs": {
-//                             "IF0": {
-//                                 "block": {
-//                                     "type": "direction_blocked",
-//                                     "id": ")n%5Q0?3J_frwLT+}}*D",
-//                                     "fields": {
-//                                         "NAME": "RIGHT_BLOCKED"
-//                                     }
-//                                 }
-//                             },
-//                             "DO0": {
-//                                 "block": {
-//                                     "type": "move_player",
-//                                     "id": "Edl]gA%TqM{1SHzEY#kN",
-//                                     "fields": {
-//                                         "VALUE": "DOWN"
-//                                     }
-//                                 }
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
-//         ]
-//     }
-//
-// };
-
-
 const startBlocks = JSON.parse(localStorage.getItem("userBlocks"));
 console.log(startBlocks);
 (function () {
@@ -190,7 +121,9 @@ console.log(startBlocks);
         },
     };
     const workspace = Blockly.inject('blocklyDiv', options);
-    Blockly.serialization.workspaces.load(startBlocks, workspace);
+    if (startBlocks) {
+        Blockly.serialization.workspaces.load(startBlocks, workspace);
+    }
 
 
 })();
